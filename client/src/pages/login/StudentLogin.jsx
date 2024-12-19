@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import "./Login.css";
 import { FormInput } from "../../components/form/FormInput";
@@ -90,6 +90,9 @@ const StudentLogin = () => {
             {" "}
             {loading ? "Submitting..." : "Submit"}{" "}
           </button>
+          <Link className="link" to={"/"}>
+            Go home
+          </Link>
           {error && <p className="error">{error}</p>}
         </form>
       </div>
