@@ -1,0 +1,45 @@
+.allexams table {
+  width: 85%;
+  margin: auto;
+}
+
+.allexams table thead tr th {
+  background-color: var(--color-primary);
+  color: black;
+  margin-bottom: 20px;
+  padding: 5px;
+  padding-bottom: 10px;
+}
+.allexams table td {
+  font-size: 15px;
+  font-weight: bold;
+}
+.allexams .selectContainer {
+  text-align: center;
+  margin: 20px;
+}
+.allexams .selectContainer select {
+  padding: 5px;
+  padding-left: 10px;
+  font-size: 1.5em;
+  border-radius: 20px;
+  outline: none;
+  border: none;
+  margin: 0 10px;
+  width: 300px;
+}
+.allexams .delete {
+  background-color: crimson;
+  padding: 5px 10px;
+  color: white;
+  border-radius: 20px;
+  font-size: 15px;
+  margin: 5px;
+}
+.allexams .edit {
+  background-color: greenyellow;
+  padding: 5px 10px;
+  font-size: 15px;
+  border-radius: 20px;
+  margin-right: 5px;
+}

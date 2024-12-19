@@ -1,0 +1,43 @@
+.home {
+  background-image: url("./img/stu3.jpg");
+  background-size: cover;
+  height: 100vh;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.home .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  transition: all 0.5s ease-in-out;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -ms-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  display: flex;
+}
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  flex-direction: column;
+  position: relative;
+}
+.container h1 {
+  font-weight: bold;
+  font-size: 3em;
+}
+
+.container .link {
+  background-color: rgb(37, 224, 37);
+  font-size: 1.5em;
+  padding: 1px 8px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  color: black;
+  width: 200px;
+}

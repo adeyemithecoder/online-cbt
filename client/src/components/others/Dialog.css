@@ -1,0 +1,51 @@
+.dialogContainer .DialogBackground {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.7);
+  position: fixed;
+  z-index: 2000;
+}
+.DialogBackground .DialogContainer {
+  height: max-content;
+  padding-bottom: 20px;
+  width: 300px;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0px 0px 16px 0.5px rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.DialogContainer .CloseDialog {
+  width: 100%;
+  text-align: right;
+}
+.DialogContainer .CloseDialog button {
+  margin-right: 12px;
+  background-color: crimson;
+}
+.DialogContainer h1 {
+  margin: 0;
+}
+.DialogContainer h2 .question {
+  font-size: 60px;
+  color: blueviolet;
+}
+.DialogContainer .action {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 4px;
+}
+.dialogContainer .DialogBackground button {
+  background-color: crimson;
+  height: 40px;
+  width: 60px;
+}
+.dialogContainer .DialogBackground .action .red {
+  background-color: green;
+}

@@ -1,0 +1,44 @@
+.admin h2,
+.admin h3 {
+  text-align: center;
+}
+
+.admin .allowStudent,
+.settings .time {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background-color: transparent;
+}
+.admin .allowStudent button {
+  background-color: var(--color-primary);
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: none;
+  font-size: 19px;
+  margin-top: 10px;
+  cursor: pointer;
+  color: black;
+  font-weight: bold;
+}
+.admin .visible {
+  color: rgb(95, 219, 95);
+}
+.admin .notvisible {
+  color: yellow;
+}
+
+.exam-history {
+  margin-top: 30px;
+}
+.exam-history div {
+  text-align: center;
+}
+.exam-history button {
+  background-color: crimson;
+  padding: 5px 10px;
+  color: white;
+  border-radius: 20px;
+  font-size: 25px;
+  margin: 5px;
+}

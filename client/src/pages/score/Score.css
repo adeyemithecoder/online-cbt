@@ -1,0 +1,46 @@
+.Score table {
+  width: 95%;
+  margin: auto;
+}
+.Score .selectContainer {
+  text-align: center;
+}
+.Score select {
+  margin: 10px;
+  outline: none;
+  cursor: pointer;
+  height: 50px;
+  width: 300px;
+  border-radius: 10px;
+  font-size: 20px;
+  background-color: var(--color-primary-variant);
+  color: var(--color-white);
+  text-align: center;
+}
+.Score select option {
+  background-color: var(--color-bg);
+  color: var(--color-white);
+  border: 1px solid gray;
+  font-size: 25px;
+  text-align: center;
+}
+.Score table thead tr th {
+  background-color: var(--color-primary);
+  color: black;
+  margin-bottom: 20px;
+  padding: 5px;
+  padding-bottom: 10px;
+}
+.Score h2,
+.Score h3 {
+  text-align: center;
+}
+.Score button {
+  background-color: crimson;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 10px;
+  border: none;
+  color: white;
+  font-weight: bold;
+}

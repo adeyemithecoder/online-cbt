@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model School {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  fullName        String?
+  name            String       @unique
+  logo            String?
+  classes         String[]     @default([])
+  viewExamHistory Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  users           User[]
+  students        Student[]   
+  subjects        Subject[]
+  exams           Exam[]
+  answers         Answer[]
+}
+
+model User {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId  
+  username        String   @unique
+  password        String  
+  name            String? 
+  gender          String? 
+  role            Role     @default(USER)
+  schoolId        String?  @db.ObjectId 
+  School          School?  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+}
+
+model Student {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  level           String
+  password        String   
+  name            String
+  username        String   @unique
+  surname         String
+  subjects        Json?
+  answers         Answer[] 
+  schoolId        String   @db.ObjectId
+  School          School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+}
+
+model Subject {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  name            String   @unique
+  schoolId        String   @db.ObjectId
+  School          School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  exams           Exam[]
+}
+model Exam {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  visible         Boolean
+  examDuration    Int
+  questions       Question[] 
+  termType        TermType
+  level           String
+  subjectId       String    @db.ObjectId
+  Subject         Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  schoolId        String   @db.ObjectId
+  School          School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  answers         Answer[]  @relation("ExamToAnswers")
+}
+
+model Question {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  question        String
+  options         String[]
+  correctAnswer   String
+  examId          String    @db.ObjectId
+  Exam            Exam      @relation(fields: [examId], references: [id], onDelete: Cascade) 
+}
+
+model Answer {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  studentId         String   @db.ObjectId
+  Student           Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  examId            String   @db.ObjectId
+  Exam              Exam     @relation("ExamToAnswers", fields: [examId], references: [id], onDelete: Cascade)
+  schoolId          String   @db.ObjectId
+  School            School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  answers           Json     @default("[]")
+}
+
+
+
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
+
+enum TermType {
+  FIRST
+  SECOND
+  THIRD
+}
+
+
+
