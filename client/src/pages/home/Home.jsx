@@ -7,7 +7,7 @@ const Home = () => {
       <div className="container">
         {" "}
         <h1>
-          Welcome to Crystal Brains School CBT. <br />
+          Welcome to As Code Elevate CBT. <br />
           We wish you success in your examination.
         </h1>
         <Link className="link" to={"/login"}>
