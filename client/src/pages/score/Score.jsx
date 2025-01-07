@@ -1,19 +1,23 @@
 import { useState } from "react";
 import axios from "axios";
-import "./Score.css";
+import styles from "./Score.module.css";
 import { apiUrl, getError } from "../../utils";
+import Spinner from "../../components/Spinner/Spinner";
 
 const Score = () => {
   const [students, setStudents] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState("");
   const [selectedTerm, setSelectedTerm] = useState("");
   const [exam, setExam] = useState([]);
+  const [examId, setExamId] = useState(null);
+  const [loading, setLoading] = useState(false);
   const schoolId = JSON.parse(
     localStorage.getItem("loggedInStudent")
   )?.schoolId;
 
   const fetchExam = async (selectedTerm, selectedLevel) => {
     try {
+      setLoading(true);
       if (!selectedTerm || !selectedLevel) {
         console.log("Both termType and level are required to fetch exams.");
         return;
@@ -32,18 +36,23 @@ const Score = () => {
     } catch (error) {
       console.log(getError(error));
       console.log(error.message);
+    } finally {
+      setLoading(true);
     }
   };
 
-  const studentsWithScore = async (examId) => {
+  const studentsWithScore = async () => {
     if (!schoolId || !examId || !selectedLevel) return;
     try {
+      setLoading(true);
       const { data } = await axios.get(
         `${apiUrl}/api/students/students-with-exam/${schoolId}/${examId}/${selectedLevel}`
       );
       setStudents(data);
     } catch (error) {
       console.log(getError(error));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,13 +71,14 @@ const Score = () => {
   };
 
   const handleExamChange = (event) => {
+    setExamId(event.target.value);
     studentsWithScore(event.target.value);
   };
 
   return (
-    <div className="Score">
+    <div className={styles.Score}>
       <h2>Students Exam Scores</h2>
-      <div className="selectContainer">
+      <div className={styles.selectContainer}>
         <select
           className="select"
           id="termSelect"
@@ -108,30 +118,37 @@ const Score = () => {
           ))}
         </select>
       </div>
-
-      <div className="student-table">
-        {students.length > 0 && (
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Surname</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {students.map((student) => (
-                <tr key={student.id}>
-                  <td>{student.name}</td>
-                  <td>{student.surname}</td>
-                  <td>{student.score}</td>
+      {loading ? (
+        <h1 className="loadindH1">
+          <Spinner size="5rem" />
+        </h1>
+      ) : (
+        <div className="student-table">
+          {students.length > 0 && (
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Surname</th>
+                  <th>Score</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        {students.length === 0 && <h2>Available students will appear here.</h2>}
-      </div>
+              </thead>
+              <tbody>
+                {students.map((student) => (
+                  <tr key={student.id}>
+                    <td>{student.name}</td>
+                    <td>{student.surname}</td>
+                    <td>{student.score}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          {students.length === 0 && (
+            <h2>Available students will appear here.</h2>
+          )}
+        </div>
+      )}
     </div>
   );
 };

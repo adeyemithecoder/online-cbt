@@ -26,7 +26,7 @@ function App() {
     const storedObject = JSON.parse(localStorage.getItem("loggedInStudent"));
     setIsAdmin(storedObject.role);
     if (!storedObject) {
-      return <Navigate to="/login" />;
+      return <Navigate to="/" />;
     }
 
     return children;

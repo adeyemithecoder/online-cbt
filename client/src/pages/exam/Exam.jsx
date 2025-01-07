@@ -7,12 +7,14 @@ import "./Exam.css";
 import Dialog from "../../components/others/Dialog";
 import AlertDialog from "../../components/others/AlertDialog";
 import { apiUrl, getError } from "../../utils";
+import Spinner from "../../components/Spinner/Spinner";
 
 const Exam = () => {
   const [exam, setExam] = useState({});
   const [exams, setExams] = useState([]);
   const [loggedInStudent, setLoggedInStudent] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [openAlert, setOpenAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [redirectAfterAlert, setRedirectAfterAlert] = useState(false);
@@ -28,7 +30,6 @@ const Exam = () => {
   useEffect(() => {
     const fetchSchool = async () => {
       try {
-        console.log(schoolId);
         const { data } = await axios.get(
           `${apiUrl}/api/users/school/${schoolId}`
         );
@@ -46,12 +47,15 @@ const Exam = () => {
   useEffect(() => {
     async function fetchExams() {
       try {
+        setLoading(true);
         const { data } = await axios.get(
           `${apiUrl}/api/exams/visible-true-exams/${schoolId}`
         );
         setExams(data);
       } catch (error) {
         console.error(getError(error));
+      } finally {
+        setLoading(false);
       }
     }
     fetchExams();
@@ -84,12 +88,15 @@ const Exam = () => {
     const selectedExamId = event.target.value;
     if (selectedExamId) {
       try {
+        setLoading(true);
         const { data } = await axios.get(
           `${apiUrl}/api/exams/exam/${selectedExamId}`
         );
         setExam(data);
       } catch (error) {
         console.error(getError(error));
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -156,6 +163,12 @@ const Exam = () => {
     localStorage.removeItem("loggedInStudent");
     navigate("/login");
   };
+  if (loading)
+    return (
+      <h1 className="loadindH1">
+        <Spinner size="5rem" /> Please wait...
+      </h1>
+    );
 
   return (
     <>
@@ -210,13 +223,20 @@ const Exam = () => {
               exam={exam}
               loggedInStudent={loggedInStudent}
               subjectName={subjectName}
+              examloading={setLoading}
             />
             <Calculator />
           </div>
         ) : (
-          <h2 className="please-select-h2">
-            Please select exam and start now!!!
-          </h2>
+          <div>
+            <h2 className="loadindH1">
+              {loading ? (
+                <Spinner size="5rem" />
+              ) : (
+                "Please select exam and start now!!!"
+              )}
+            </h2>
+          </div>
         )}
       </div>
     </>

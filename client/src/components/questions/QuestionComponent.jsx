@@ -7,11 +7,13 @@ import axios from "axios";
 import Dialog from "../others/Dialog"; // Adjust the path as needed
 import AlertDialog from "../others/AlertDialog"; // Adjust the path as needed
 import { apiUrl, getError } from "../../utils";
+import Spinner from "../Spinner/Spinner";
 
 const QuestionComponent = ({
   exam,
   loggedInStudent,
   subjectName,
+  examloading,
   updateStudentScore,
 }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -29,9 +31,12 @@ const QuestionComponent = ({
   const schoolId = JSON.parse(
     localStorage.getItem("loggedInStudent")
   )?.schoolId;
+
   const navigate = useNavigate();
+
   const handleSubmit = useCallback(async () => {
     setLoading(true);
+    examloading(true);
     let score = 0;
     const studentQuestionsAndAnswers = {
       studentId: loggedInStudent.id,
@@ -56,13 +61,21 @@ const QuestionComponent = ({
       }
     });
     updateStudentScore(score, loggedInStudent.id);
+    examloading(false);
     setLoading(false);
     setAlertMessage(
       `Your score is ${score}/${exam.questions?.length}. You are good to go.`
     );
     setOpenAlert(true);
     setPostSubmitNavigation(true);
-  }, [answers, loggedInStudent, exam, schoolId, updateStudentScore]);
+  }, [
+    answers,
+    loggedInStudent,
+    exam,
+    examloading,
+    schoolId,
+    updateStudentScore,
+  ]);
 
   useEffect(() => {
     if (!openAlert && postSubmitNavigation) {
@@ -124,7 +137,12 @@ const QuestionComponent = ({
   const confirmSubmit = () => {
     setOpenDialog(true);
   };
-
+  if (loading)
+    return (
+      <h1 className="loadindH1">
+        <Spinner size="5rem" />
+      </h1>
+    );
   return (
     <>
       {openDialog && (

@@ -1,6 +1,7 @@
 .allexams table {
   width: 85%;
   margin: auto;
+  border-collapse: collapse;
 }
 
 .allexams table thead tr th {
@@ -13,6 +14,7 @@
 .allexams table td {
   font-size: 15px;
   font-weight: bold;
+  border: 2px solid var(--color-primary);
 }
 .allexams .selectContainer {
   text-align: center;

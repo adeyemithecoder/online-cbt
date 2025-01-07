@@ -42,11 +42,7 @@
 .admin {
   display: block;
 }
-.please-select-h2 {
-  background-color: var(--color-primary);
-  text-align: center;
-  color: black;
-}
+
 .exam-select-container {
   height: 50px;
   margin: 10px;

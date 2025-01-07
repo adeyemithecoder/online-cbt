@@ -4,21 +4,30 @@ import "./AllStudent.css";
 import { Link } from "react-router-dom";
 import Dialog from "../../components/others/Dialog";
 import { apiUrl, getError } from "../../utils";
+import Spinner from "../../components/Spinner/Spinner";
 
 const AllStudents = () => {
   const [students, setStudents] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
   const schoolId = JSON.parse(
     localStorage.getItem("loggedInStudent")
   )?.schoolId;
+
   const handleLevelChange = async (event) => {
     const selectedLevel = event.target.value;
-    console.log(selectedLevel);
-    const { data } = await axios.get(
-      `${apiUrl}/api/students/get-students-by-level/${selectedLevel}/${schoolId}`
-    );
-    setStudents(data);
+    try {
+      setLoading(true);
+      const { data } = await axios.get(
+        `${apiUrl}/api/students/get-students-by-level/${selectedLevel}/${schoolId}`
+      );
+      setStudents(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
   const handleDeleteStudent = (studentId) => {
     setStudentToDelete(studentId);
@@ -68,43 +77,47 @@ const AllStudents = () => {
             <option value="ss3">SSS 3</option>
           </select>
         </div>
-        <table border={3}>
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Name</th>
-              <th>Surname</th>
-              <th>Username</th>
-              <th>Password</th>
-              <th>Class</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.length === 0 && <p>No students available.</p>}
-            {students.map((student, index) => (
-              <tr key={student.id}>
-                <td>{index + 1}</td>
-                <td>{student.name}</td>
-                <td>{student.surname}</td>
-                <td>{student.username}</td>
-                <td>{student.password}</td>
-                <td>{student.level}</td>
-                <td className="actions">
-                  <button className="edit">
-                    <Link to={`/edit-student/${student.id}`}>Edit</Link>
-                  </button>
-                  <button
-                    className="delete"
-                    onClick={() => handleDeleteStudent(student.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
+        {loading ? (
+          <Spinner />
+        ) : (
+          <table border={3}>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Class</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {students.length === 0 && <p>No students available.</p>}
+              {students.map((student, index) => (
+                <tr key={student.id}>
+                  <td>{index + 1}</td>
+                  <td>{student.name}</td>
+                  <td>{student.surname}</td>
+                  <td>{student.username}</td>
+                  <td>{student.password}</td>
+                  <td>{student.level}</td>
+                  <td className="actions">
+                    <button className="edit">
+                      <Link to={`/edit-student/${student.id}`}>Edit</Link>
+                    </button>
+                    <button
+                      className="delete"
+                      onClick={() => handleDeleteStudent(student.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

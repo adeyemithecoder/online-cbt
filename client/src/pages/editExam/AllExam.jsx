@@ -39,7 +39,7 @@ const AllExam = () => {
   const handleTermChange = async (event) => {
     const term = event.target.value;
     setSelectedTerm(term);
-    await fetchExam(term, selectedLevel);
+    await fetchExams(term, selectedLevel);
   };
 
   // Handle Level Change

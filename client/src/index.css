@@ -45,3 +45,8 @@ h5 {
   background-color: var(--color-bg);
   color: white;
 }
+.loadindH1 {
+  background-color: var(--color-primary);
+  text-align: center;
+  color: black;
+}

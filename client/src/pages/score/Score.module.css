@@ -1,6 +1,7 @@
 .Score table {
   width: 95%;
   margin: auto;
+  border-collapse: collapse;
 }
 .Score .selectContainer {
   text-align: center;
@@ -31,8 +32,11 @@
   padding: 5px;
   padding-bottom: 10px;
 }
-.Score h2,
-.Score h3 {
+.Score table td {
+  border: 2px solid var(--color-primary);
+}
+
+.Score h2 {
   text-align: center;
 }
 .Score button {
