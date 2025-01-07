@@ -17,11 +17,11 @@ const Score = () => {
 
   const fetchExam = async (selectedTerm, selectedLevel) => {
     try {
-      setLoading(true);
       if (!selectedTerm || !selectedLevel) {
         console.log("Both termType and level are required to fetch exams.");
         return;
       }
+      setLoading(true);
       const { data } = await axios.get(
         `${apiUrl}/api/exams/exams-by-level-term`,
         {
@@ -32,15 +32,16 @@ const Score = () => {
           },
         }
       );
+      console.log(data);
       setExam(data);
     } catch (error) {
       console.log(getError(error));
       console.log(error.message);
     } finally {
-      setLoading(true);
+      setLoading(false);
     }
   };
-
+  console.log(exam);
   const studentsWithScore = async () => {
     if (!schoolId || !examId || !selectedLevel) return;
     try {

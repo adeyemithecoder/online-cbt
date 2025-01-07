@@ -364,7 +364,6 @@ studentRoute.get(
   expressAsyncHandler(async (req, res) => {
     try {
       const { schoolId, examId, studentLevel } = req.params;
-
       // Find all students matching the schoolId and level
       const students = await prisma.student.findMany({
         where: {
@@ -372,11 +371,6 @@ studentRoute.get(
           level: studentLevel,
         },
       });
-
-      if (!students || students.length === 0) {
-        return res.status(404).json({ message: "No students found" });
-      }
-
       // Extract the relevant data
       const filteredStudents = [];
       for (const student of students) {

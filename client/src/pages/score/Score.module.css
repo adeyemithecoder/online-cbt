@@ -34,6 +34,8 @@
 }
 .Score table td {
   border: 2px solid var(--color-primary);
+  font-size: 25px;
+  font-weight: bold;
 }
 
 .Score h2 {
