@@ -1,5 +1,10 @@
 /* eslint-disable react/prop-types */
-import { Navigate, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
@@ -24,22 +29,25 @@ function App() {
 
   const ProtectedRoute = ({ children }) => {
     const storedObject = JSON.parse(localStorage.getItem("loggedInStudent"));
-    setIsAdmin(storedObject.role);
     if (!storedObject) {
       return <Navigate to="/" />;
     }
 
+    setIsAdmin(storedObject.role); // Ensure this is placed correctly; consider moving it to a `useEffect`.
+
     return children;
   };
+
   return (
-    <>
-      {isAdmin == "ADMIN" && <Navbar />}
+    <Router>
+      {isAdmin === "ADMIN" && <Navbar />}
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/student-login" element={<StudentLogin />} />
         <Route path="/" element={<Home />} />
 
+        {/* Protected Routes */}
         <Route
           path="/register"
           element={
@@ -120,7 +128,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/ExamHistory"
           element={
@@ -146,9 +153,10 @@ function App() {
           }
         />
 
+        {/* Redirect unknown routes */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
-    </>
+    </Router>
   );
 }
 

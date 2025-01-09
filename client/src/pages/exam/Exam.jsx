@@ -166,7 +166,7 @@ const Exam = () => {
   if (loading)
     return (
       <h1 className="loadindH1">
-        <Spinner size="5rem" /> Please wait...
+        <Spinner size="5rem" />
       </h1>
     );
 
