@@ -155,7 +155,7 @@ const Subject = () => {
 
   const handleUpdateExams = async () => {
     try {
-      // Combine visibility and duration changes into a single updates array
+      setLoading(true);
       const updates = Object.keys(visibilityChanges).map((id) => ({
         id,
         visible: visibilityChanges[id],
@@ -171,6 +171,8 @@ const Subject = () => {
     } catch (error) {
       console.error(error.message);
       alert("Error updating exams: " + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -281,7 +283,9 @@ const Subject = () => {
         </tbody>
       </table>
       <div className={styles.updateExamBtn}>
-        <button onClick={handleUpdateExams}>Save</button>
+        <button disabled={loading} onClick={handleUpdateExams}>
+          {loading ? "Please wait..." : "Save"}
+        </button>
       </div>
 
       <div className={styles.allSubjects}>
