@@ -80,7 +80,7 @@ const QuestionComponent = ({
   useEffect(() => {
     if (!openAlert && postSubmitNavigation) {
       localStorage.removeItem("loggedInStudent");
-      navigate("/student-login");
+      navigate("/");
     }
   }, [openAlert, postSubmitNavigation, navigate]);
 

@@ -15,6 +15,7 @@
   font-size: 15px;
   font-weight: bold;
   border: 2px solid var(--color-primary);
+  padding-left: 5px;
 }
 .allexams .selectContainer {
   text-align: center;

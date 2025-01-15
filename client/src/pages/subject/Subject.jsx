@@ -70,6 +70,7 @@ const Subject = () => {
       return;
     }
     try {
+      setLoading(true);
       await axios.post(`${apiUrl}/api/subjects/create-subject`, {
         name: subjectName,
         schoolId: schoolId,
@@ -82,6 +83,8 @@ const Subject = () => {
       setSubjects(data);
     } catch (error) {
       alert(getError(error));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -202,7 +205,9 @@ const Subject = () => {
     <div className={styles.subject}>
       <div className={styles.newSubject}>
         <input ref={subjectRef} type="text" placeholder="Enter new subject" />
-        <button onClick={createSubject}>Add new subject</button>
+        <button disabled={loading} onClick={createSubject}>
+          {loading ? "Please wait..." : "Add new subject"}
+        </button>
       </div>
       <div className={styles.selectContainer}>
         <select value={selectedTerm} onChange={handleTermChange}>
@@ -225,7 +230,9 @@ const Subject = () => {
           <option value="ss3">SSS 3</option>
         </select>
         <select value={selectedSubjectId} onChange={handleSubjectChange}>
-          <option value="">Select Subject</option>
+          <option value="" disabled>
+            Select Subject
+          </option>
           {subjects.map((subject) => (
             <option key={subject.id} value={subject.id}>
               {subject.name}

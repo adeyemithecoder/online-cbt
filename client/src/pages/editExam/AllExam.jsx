@@ -3,11 +3,13 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { apiUrl, getError } from "../../utils";
 import styles from "./AllExam.module.css";
+import Spinner from "../../components/Spinner/Spinner";
 
 const AllExam = () => {
   const [selectedLevel, setSelectedLevel] = useState("");
   const [selectedTerm, setSelectedTerm] = useState("");
   const [exams, setExams] = useState([]);
+  const [loading, setLoading] = useState(false);
   const schoolId = JSON.parse(
     localStorage.getItem("loggedInStudent")
   )?.schoolId;
@@ -15,6 +17,7 @@ const AllExam = () => {
   // Fetch exams based on selected level and term
   const fetchExams = async (selectedTerm, selectedLevel) => {
     try {
+      setLoading(true);
       if (!selectedTerm || !selectedLevel) {
         console.log("Both termType and level are required to fetch exams.");
         return;
@@ -29,9 +32,12 @@ const AllExam = () => {
           },
         }
       );
+      console.log(data);
       setExams(data);
     } catch (error) {
       console.log(getError(error));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,44 +93,51 @@ const AllExam = () => {
           <option value="ss3">SSS 3</option>
         </select>
       </div>
-
-      <table>
-        {exams.length === 0 && (
-          <p>No exams found. Please select a term and class.</p>
-        )}
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Subject</th>
-            <th>Level</th>
-            <th>Term</th>
-            <th>Duration (mins)</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {exams.map((exam, index) => (
-            <tr key={exam.id}>
-              <td>{index + 1}</td>
-              <td>{exam.subjectName}</td>
-              <td>{exam.level.toUpperCase()}</td>
-              <td>{exam.termType}</td>
-              <td>{exam.examDuration / 60}</td>
-              <td>
-                <Link to={`/edit-exam/${exam.id}`} className={styles.edit}>
-                  Go to Questions
-                </Link>
-                <button
-                  className={styles.delete}
-                  onClick={() => handleDelete(exam.id)}
-                >
-                  Delete
-                </button>
-              </td>
+      {loading ? (
+        <h1 className="loadindH1">
+          <Spinner size="5rem" />
+        </h1>
+      ) : (
+        <table>
+          {exams.length === 0 && (
+            <p>No exams found. Please select a term and class.</p>
+          )}
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Subject</th>
+              <th>Level</th>
+              <th>Term</th>
+              <th>Duration (mins)</th>
+              <th>Visibility</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {exams.map((exam, index) => (
+              <tr key={exam.id}>
+                <td>{index + 1}</td>
+                <td>{exam.subjectName}</td>
+                <td>{exam.level.toUpperCase()}</td>
+                <td>{exam.termType}</td>
+                <td>{exam.examDuration / 60}</td>
+                <td>{exam.visible ? "Yes" : "No"}</td>
+                <td>
+                  <Link to={`/edit-exam/${exam.id}`} className={styles.edit}>
+                    Go to Questions
+                  </Link>
+                  <button
+                    className={styles.delete}
+                    onClick={() => handleDelete(exam.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };

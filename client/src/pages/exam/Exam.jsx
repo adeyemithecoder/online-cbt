@@ -33,7 +33,6 @@ const Exam = () => {
         const { data } = await axios.get(
           `${apiUrl}/api/users/school/${schoolId}`
         );
-        console.log(data);
         setAllowStudent(data.viewExamHistory);
       } catch (error) {
         console.error(getError(error));
@@ -144,14 +143,14 @@ const Exam = () => {
     const storedObject = JSON.parse(localStorage.getItem("loggedInStudent"));
     setLoggedInStudent(storedObject);
     if (!storedObject) {
-      navigate("/login");
+      navigate("/");
     } else {
       checkIfScoreExist(storedObject.id);
     }
   }, [navigate, checkIfScoreExist]);
   useEffect(() => {
     if (redirectAfterAlert && !openAlert) {
-      navigate("/login");
+      navigate("/");
     }
   }, [redirectAfterAlert, openAlert, navigate]);
 
@@ -161,7 +160,7 @@ const Exam = () => {
 
   const confirmLogout = () => {
     localStorage.removeItem("loggedInStudent");
-    navigate("/login");
+    navigate("/");
   };
   if (loading)
     return (
@@ -189,7 +188,7 @@ const Exam = () => {
             {exams.map((exam) => (
               <option
                 className={
-                  loggedInStudent?.username === "admin"
+                  loggedInStudent?.name === "admin"
                     ? ""
                     : loggedInStudent?.level !== exam.level
                     ? "notInTheClass"

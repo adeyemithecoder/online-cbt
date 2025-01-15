@@ -7,7 +7,6 @@ import {
 } from "react-icons/fa";
 import { FcClock } from "react-icons/fc";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LuPencil } from "react-icons/lu";
 import { FaPersonCircleQuestion } from "react-icons/fa6";
 import { PiUsersFourThin } from "react-icons/pi";
 import { IoPersonAddSharp } from "react-icons/io5";
@@ -32,7 +31,7 @@ const Navbar = () => {
   const confirmLogout = () => {
     localStorage.removeItem("loggedInStudent");
     setOpenDialog(false);
-    navigate("/login");
+    navigate("/");
   };
 
   const links = [

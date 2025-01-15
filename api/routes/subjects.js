@@ -9,25 +9,37 @@ subjectRoute.post(
   expressAsyncHandler(async (req, res) => {
     try {
       const { name, schoolId } = req.body;
-      const existingSubject = await prisma.subject.findUnique({
-        where: { name },
+      // Check if a subject with the same name and schoolId already exists
+      const existingSubject = await prisma.subject.findFirst({
+        where: {
+          name,
+          schoolId,
+        },
       });
+
       if (existingSubject) {
-        return res
-          .status(409)
-          .json({ message: `Subject '${name}' already exists.` });
+        return res.status(409).json({
+          message: `Subject '${name}' already exists for the given school.`,
+        });
       }
+
+      // Create a new subject
       const subject = await prisma.subject.create({
         data: {
           name,
           schoolId,
         },
       });
-      res.status(201).json(subject);
+
+      res.status(201).json({
+        message: "Subject created successfully!",
+        subject,
+      });
     } catch (err) {
-      res
-        .status(500)
-        .json({ message: "Failed to create subject", error: err.message });
+      res.status(500).json({
+        message: "Failed to create subject",
+        error: err.message,
+      });
     }
   })
 );
