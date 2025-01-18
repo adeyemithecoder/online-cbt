@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import "./Home.css";
+
 const Home = () => {
   return (
     <div className="home">
+      <img src="./img/stu3.jpg" alt="Background" className="background-img" />
       <span className="overlay"></span>
       <div className="container">
-        {" "}
         <h1>
           Welcome to As Code Elevate CBT. <br />
           We wish you success in your examination.
