@@ -5,6 +5,7 @@ import "./Login.css";
 import { FormInput } from "../../components/form/FormInput";
 import axios from "axios";
 import { apiUrl, getError } from "../../utils";
+import { IoIosEyeOff, IoMdEye } from "react-icons/io";
 
 const StudentLogin = () => {
   const navigate = useNavigate();
@@ -85,6 +86,8 @@ const StudentLogin = () => {
             required={true}
             value={values.password}
             onChange={handleInputChange}
+            eyeOpen={<IoMdEye />}
+            eyeClose={<IoIosEyeOff />}
           />
           <button disabled={loading}>
             {" "}

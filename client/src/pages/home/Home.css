@@ -39,17 +39,35 @@
 .container h1 {
   font-weight: bold;
   font-size: 3em;
-  color: white; /* Ensures text is visible on dark background */
+  color: white;
   text-align: center;
 }
 
 .container .link {
-  background-color: rgb(37, 224, 37);
-  font-size: 1.5em;
-  padding: 1px 8px;
-  margin-bottom: 20px;
-  border-radius: 10px;
-  color: black;
-  width: 200px;
-  text-align: center;
+  background-color: purple; /* Main button color */
+  color: white; /* Text color */
+  font-size: 1.5em; /* Text size */
+  padding: 10px 20px; /* More padding for better button size */
+  margin-bottom: 20px; /* Space between buttons */
+  border-radius: 12px; /* Rounded corners */
+  width: 220px; /* Slightly wider button */
+  text-align: center; /* Center-align text */
+  text-decoration: none; /* Remove underline */
+  display: inline-block; /* Ensure proper button-like appearance */
+  font-weight: bold; /* Make text bold */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+  transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+.container .link:hover {
+  background-color: #6a0dad; /* Slightly lighter purple on hover */
+  color: #fff; /* Maintain white text on hover */
+  transform: scale(1.05); /* Slightly enlarge button on hover */
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2); /* Enhance shadow on hover */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+.container .link:active {
+  transform: scale(0.98); /* Slightly shrink on click */
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2); /* Adjust shadow on click */
 }

@@ -3,6 +3,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 .allInput label {
   font-size: 20px;
@@ -17,13 +18,15 @@
   display: none;
   color: red;
 }
-/* input:invalid[focus="true"] {
-  border: 1px solid red;
+.allInput .icon {
+  position: absolute;
+  right: 50px;
+  bottom: 0px;
+  font-size: 30px;
+  color: black;
+  cursor: pointer;
+  background-color: transparent;
 }
-input:invalid[focus="true"] ~ span {
-  font-size: large;
-  display: block;
-} */
 input.focused:invalid {
   border: 1px solid red;
 }

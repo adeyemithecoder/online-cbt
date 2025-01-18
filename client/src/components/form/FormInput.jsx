@@ -13,10 +13,16 @@ export const FormInput = ({
   nameRef,
   name,
   onChange,
+  eyeOpen,
+  eyeClose,
 }) => {
+  const [showPassword, setShowPassword] = useState(false);
   const [focus, setFocus] = useState(false);
   const handleFocus = () => {
     setFocus(true);
+  };
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
   };
   return (
     <div className="allInput">
@@ -28,7 +34,7 @@ export const FormInput = ({
         name={name}
         autoComplete="off"
         ref={nameRef}
-        type={type}
+        type={showPassword ? "text" : type}
         pattern={pattern}
         onChange={onChange}
         placeholder={placeholder}
@@ -36,6 +42,9 @@ export const FormInput = ({
         onFocus={() => name === "confirmPassword" && setFocus(true)}
       />
       <span>{errMes}</span>
+      <div className="icon" onClick={togglePasswordVisibility}>
+        {showPassword ? eyeOpen : eyeClose}
+      </div>
     </div>
   );
 };
