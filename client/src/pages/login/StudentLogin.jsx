@@ -64,8 +64,7 @@ const StudentLogin = () => {
     <div style={{ marginTop: "120px" }}>
       <div className="register">
         <form className="form-control" onSubmit={handleLogin}>
-          {" "}
-          <h1>student Login</h1>
+          <h1>Student Login</h1>
           <FormInput
             errMes="Username should be 3-16 characters and must not include any special character!"
             label=""
