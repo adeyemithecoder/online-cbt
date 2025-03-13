@@ -222,7 +222,6 @@ const Exam = () => {
               exam={exam}
               loggedInStudent={loggedInStudent}
               subjectName={subjectName}
-              examloading={setLoading}
             />
             <Calculator />
           </div>

@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { apiUrl, getError } from "../../utils";
 import "./ExamHistory.css";
+import Spinner from "../../components/Spinner/Spinner";
 
 const ExamHistory = () => {
   const [studentQuestionsAndAnswers, setStudentQuestionsAndAnswers] = useState(
@@ -10,6 +11,7 @@ const ExamHistory = () => {
   );
   const [selectedSubject, setSelectedSubject] = useState("");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const schoolId = JSON.parse(
     localStorage.getItem("loggedInStudent")
@@ -20,6 +22,7 @@ const ExamHistory = () => {
   useEffect(() => {
     const fetchStudentAnswers = async () => {
       try {
+        setLoading(true);
         const { data } = await axios.get(
           `${apiUrl}/api/users/school/${schoolId}`
         );
@@ -37,6 +40,8 @@ const ExamHistory = () => {
         }
       } catch (error) {
         console.error(getError(error));
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -98,6 +103,12 @@ const ExamHistory = () => {
       )
     );
   };
+  if (loading)
+    return (
+      <h1 className="loadindH1">
+        <Spinner size="5rem" />
+      </h1>
+    );
   return (
     <>
       {allowStudent ? (
@@ -141,9 +152,6 @@ const ExamHistory = () => {
                       <p>Unanswered Questions: {stats.noSelectedOption}</p>
                       {data.questionsAndAnswers.map((qa, qaIndex) => (
                         <div className="each-ques" key={qaIndex}>
-                          <p>
-                            Question {qaIndex + 1}: {qa.question}
-                          </p>
                           <p>
                             Question {qaIndex + 1}:{" "}
                             {formatQuestionToJSX(qa.question)}

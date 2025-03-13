@@ -49,4 +49,5 @@ h5 {
   background-color: var(--color-primary);
   text-align: center;
   color: black;
+  /* height: 100vh; */
 }

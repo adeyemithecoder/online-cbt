@@ -32,7 +32,6 @@ const Score = () => {
           },
         }
       );
-      console.log(data);
       setExam(data);
     } catch (error) {
       console.log(getError(error));
@@ -41,14 +40,15 @@ const Score = () => {
       setLoading(false);
     }
   };
-  console.log(exam);
-  const studentsWithScore = async () => {
+
+  const studentsWithScore = async (examId, selectedLevel) => {
     if (!schoolId || !examId || !selectedLevel) return;
     try {
       setLoading(true);
       const { data } = await axios.get(
         `${apiUrl}/api/students/students-with-exam/${schoolId}/${examId}/${selectedLevel}`
       );
+      console.log(data);
       setStudents(data);
     } catch (error) {
       console.log(getError(error));
@@ -58,24 +58,24 @@ const Score = () => {
   };
 
   const handleTermChange = async (event) => {
-    const selectedTerm = event.target.value;
-    setSelectedTerm(selectedTerm);
-    await fetchExam(selectedTerm, selectedLevel);
-    studentsWithScore();
+    setSelectedTerm(event.target.value);
+    await fetchExam(event.target.value, selectedLevel);
+    studentsWithScore(examId, selectedLevel);
   };
 
   const handleLevelChange = async (event) => {
-    const selectedLevel = event.target.value;
-    setSelectedLevel(selectedLevel);
-    await fetchExam(selectedTerm, selectedLevel);
-    studentsWithScore();
+    setSelectedLevel(event.target.value);
+    await fetchExam(selectedTerm, event.target.value);
+    studentsWithScore(examId, event.target.value);
   };
 
-  const handleExamChange = (event) => {
+  const handleExamChange = async (event) => {
     setExamId(event.target.value);
-    studentsWithScore(event.target.value);
+    await fetchExam(selectedTerm, selectedLevel);
+    studentsWithScore(event.target.value, selectedLevel);
   };
-
+  console.log(exam);
+  console.log(students);
   return (
     <div className={styles.Score}>
       <h2>Students Exam Scores</h2>
