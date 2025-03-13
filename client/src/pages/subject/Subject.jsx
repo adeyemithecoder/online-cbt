@@ -180,13 +180,13 @@ const Subject = () => {
   };
 
   const handleEditClick = (subject) => {
-    setEditingId(subject.id); // Set the current subject to edit mode
+    setEditingId(subject.id);
     setUpdatedName(subject.name); // Pre-fill input with current name
   };
 
   const handleSaveClick = async (id) => {
     try {
-      await axios.put(`${apiUrl}/api/subjects//subject/${id}`, {
+      await axios.put(`${apiUrl}/api/subjects/subject/${id}`, {
         name: updatedName,
       });
       const { data } = await axios.get(
@@ -194,7 +194,7 @@ const Subject = () => {
       );
       setSubjects(data);
       alert("Subject updated successfully!");
-      setEditingId(null); // Exit edit mode
+      setEditingId(null);
     } catch (err) {
       console.error(err.message);
       alert("An error occurred while updating the subject.");
