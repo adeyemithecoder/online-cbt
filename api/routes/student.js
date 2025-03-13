@@ -2,6 +2,199 @@ import express from "express";
 const studentRoute = express.Router();
 import expressAsyncHandler from "express-async-handler";
 import prisma from "../prisma/prisma.js";
+// const studentList = [
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss1",
+//     username: "CBmajesty",
+//     password: "Ayodeji1",
+//     name: "Majesty",
+//     surname: "Ayodeji",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss1",
+//     username: "cbchisom",
+//     password: "Chukwunagolu1",
+//     name: "Chisom Gift",
+//     surname: "Chukwunagolu",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss1",
+//     username: "cbdavid2",
+//     password: "Daniel12",
+//     name: "David Derick",
+//     surname: "Daniel",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss1",
+//     username: "cbawesome",
+//     password: "Lumanze1",
+//     name: "Awesome",
+//     surname: "Lumanze",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss1",
+//     username: "cbpraise",
+//     password: "Abiodun1",
+//     name: "Praise",
+//     surname: "Abiodun",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss1",
+//     username: "cbalamin3",
+//     password: "Yakubu12",
+//     name: "Al-Amin",
+//     surname: "Yakubu",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss2",
+//     username: "cbaisha",
+//     password: "Ibrahim12",
+//     name: "Aisha",
+//     surname: "Ibrahim",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss2",
+//     username: "cbfatimah2",
+//     password: "Abdulrahman1",
+//     name: "Fatimah",
+//     surname: "Abarshi",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss2",
+//     username: "cbtessy",
+//     password: "Adebe123",
+//     name: "Theresa ",
+//     surname: "Adebe",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss2",
+//     username: "cbvictoria13",
+//     password: "Osueme12",
+//     name: "VICTORIA",
+//     surname: "OSUEME",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss2",
+//     username: "cbfaith2",
+//     password: "Msughter1",
+//     name: "Faith Mvenna",
+//     surname: "Msughter ",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss2",
+//     username: "cbrukayya",
+//     password: "Yusufrukayya1",
+//     name: "Rukayya",
+//     surname: "Yusuf",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss2",
+//     username: "cbmary",
+//     password: "Ajahmary1",
+//     name: "Mary",
+//     surname: "Ajah",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss2",
+//     username: "cbvictoria1",
+//     password: "Osueme12",
+//     name: "VICTORIA",
+//     surname: "OSUEME",
+//   },
+
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss3",
+//     username: "cbpeculiar",
+//     password: "Julius12",
+//     name: "Peculiar",
+//     surname: "Julius",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss3",
+//     username: "cbhanifa1",
+//     password: "Yusuf123",
+//     name: "Hanifa Onono",
+//     surname: "Yusuf",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss3",
+//     username: "cbthankgod",
+//     password: "Anizoba1",
+//     name: "ThankGod",
+//     surname: "Anizoba",
+//   },
+//   {
+//     schoolId: "675adb379721834cf981ff36",
+//     level: "ss3",
+//     username: "cbmubarak",
+//     password: "Yakubu12",
+//     name: "Mubarak",
+//     surname: "Yakubu",
+//   },
+// ];
+// studentRoute.post(
+//   "/create-students",
+//   expressAsyncHandler(async (req, res) => {
+//     try {
+//       const students = studentList;
+//       if (!Array.isArray(students) || students.length === 0) {
+//         return res.status(400).json({ message: "Invalid student data" });
+//       }
+
+//       const createdStudents = [];
+
+//       for (const student of students) {
+//         const { username, schoolId } = student;
+
+//         if (!username || !schoolId) {
+//           return res
+//             .status(400)
+//             .json({ message: "username and schoolId are required" });
+//         }
+
+//         // Check if the student already exists
+//         const existingStudent = await prisma.student.findUnique({
+//           where: { username },
+//         });
+
+//         if (existingStudent) {
+//           continue; // Skip this student if they already exist
+//         }
+
+//         // Create the student
+//         const newStudent = await prisma.student.create({
+//           data: student,
+//         });
+
+//         createdStudents.push(newStudent);
+//       }
+
+//       res.status(201).json({
+//         message: `${createdStudents.length} students added successfully`,
+//         students: createdStudents,
+//       });
+//     } catch (err) {
+//       res.status(500).json({ message: err.message });
+//     }
+//   })
+// );
 
 //create-student
 studentRoute.post(
