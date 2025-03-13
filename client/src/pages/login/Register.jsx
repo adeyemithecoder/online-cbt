@@ -60,8 +60,6 @@ const Register = () => {
         {" "}
         <h1>Register Here</h1>
         <FormInput
-          // errMes="Surname should be 3-16 characters and must not include any
-          // special character or space!"
           label=""
           type="text"
           nameRef={nameRef}
