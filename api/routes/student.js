@@ -3,6 +3,40 @@ const studentRoute = express.Router();
 import expressAsyncHandler from "express-async-handler";
 import prisma from "../prisma/prisma.js";
 
+//create-student
+studentRoute.post(
+  "/create-student",
+  expressAsyncHandler(async (req, res) => {
+    try {
+      const { username, schoolId } = req.body;
+
+      // Check if schoolId is provided
+      if (!schoolId) {
+        return res.status(400).json({ message: "schoolId is required" });
+      }
+
+      // Check if student already exists
+      const studentAlreadyExist = await prisma.student.findUnique({
+        where: { username },
+      });
+
+      if (studentAlreadyExist) {
+        return res.status(409).json({
+          message: `Student with the name '${username}' already exists`,
+        });
+      }
+
+      // Create new student
+      const newStudent = await prisma.student.create({
+        data: req.body,
+      });
+
+      res.status(201).json(newStudent);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  })
+);
 //create-answer
 studentRoute.post(
   "/create-answer",
@@ -48,6 +82,7 @@ studentRoute.post(
   })
 );
 
+//delete-answer
 studentRoute.delete(
   "/delete-answers/:schoolId",
   expressAsyncHandler(async (req, res) => {
@@ -222,29 +257,6 @@ studentRoute.get(
       res.status(200).json(students);
     } catch (err) {
       console.error("Error fetching students:", err.message);
-      res.status(500).json({ message: err.message });
-    }
-  })
-);
-
-//create-student
-studentRoute.post(
-  "/create-student",
-  expressAsyncHandler(async (req, res) => {
-    try {
-      const studentAlreadyExist = await prisma.student.findUnique({
-        where: { username: req.body.username },
-      });
-      if (studentAlreadyExist) {
-        res.status(409).send({
-          message: `Student with the name '${req.body.username}' already exists`,
-        });
-      }
-      const newStudent = await prisma.student.create({
-        data: req.body,
-      });
-      res.status(200).json(newStudent);
-    } catch (err) {
       res.status(500).json({ message: err.message });
     }
   })
