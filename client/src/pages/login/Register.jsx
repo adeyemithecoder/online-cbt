@@ -57,7 +57,6 @@ const Register = () => {
   return (
     <div className="register ">
       <form className="form-control" onSubmit={handleAddStudent}>
-        {" "}
         <h1>Register Here</h1>
         <FormInput
           label=""
