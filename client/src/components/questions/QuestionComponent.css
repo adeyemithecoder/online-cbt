@@ -43,7 +43,9 @@
   width: max-content;
   margin-top: 10px;
 }
-
+.underline {
+  text-decoration: underline;
+}
 .each-question ul li {
   max-width: 600px;
 }

@@ -86,6 +86,18 @@ const ExamHistory = () => {
     ...new Set(studentQuestionsAndAnswers.map((item) => item.examName)),
   ];
 
+  const formatQuestionToJSX = (text) => {
+    const parts = text.split(/\[([^\]]+)\]/g); // Split at words inside brackets
+    return parts.map((part, index) =>
+      index % 2 === 1 ? (
+        <span key={index} className="underline">
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
   return (
     <>
       {allowStudent ? (
@@ -132,6 +144,11 @@ const ExamHistory = () => {
                           <p>
                             Question {qaIndex + 1}: {qa.question}
                           </p>
+                          <p>
+                            Question {qaIndex + 1}:{" "}
+                            {formatQuestionToJSX(qa.question)}
+                          </p>
+
                           <p>
                             Selected Option:{" "}
                             {qa.selectedOption || "Not Answered"}

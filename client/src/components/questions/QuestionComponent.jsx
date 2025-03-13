@@ -31,7 +31,7 @@ const QuestionComponent = ({
   const schoolId = JSON.parse(
     localStorage.getItem("loggedInStudent")
   )?.schoolId;
-
+  console.log(exam);
   const navigate = useNavigate();
 
   const handleSubmit = useCallback(async () => {
@@ -143,6 +143,20 @@ const QuestionComponent = ({
         <Spinner size="5rem" />
       </h1>
     );
+
+  const formatQuestionToJSX = (text) => {
+    const parts = text.split(/\[([^\]]+)\]/g); // Split at words inside brackets
+    return parts.map((part, index) =>
+      index % 2 === 1 ? (
+        <span key={index} className="underline">
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
+
   return (
     <>
       {openDialog && (
@@ -182,7 +196,8 @@ const QuestionComponent = ({
               >
                 <h2>{index + 1}</h2>
                 <div className="each-question">
-                  <span>{question.question}</span>
+                  <span>{formatQuestionToJSX(question.question)}</span>
+
                   <ul>
                     {question.options.map((option, optionIndex) => {
                       const optionLabels = ["(a)", "(b)", "(c)", "(d)"];

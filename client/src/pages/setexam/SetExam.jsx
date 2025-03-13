@@ -21,7 +21,7 @@ const SetExam = () => {
       const incompleteQuestions = filteredData.some((item) => item.length < 6);
       if (incompleteQuestions) {
         alert("One or more questions are incomplete.");
-        return; // Stop further processing if any item is incomplete
+        return;
       }
 
       const allQuestion = filteredData.map((item, index) => {
