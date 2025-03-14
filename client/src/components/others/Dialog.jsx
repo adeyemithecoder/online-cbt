@@ -21,8 +21,12 @@ const Dialog = ({ setOpenDialog, message, action, loading }) => {
             <button className="red" onClick={() => setOpenDialog(false)}>
               No
             </button>
-            <button disabled={loading} className="yes" onClick={action}>
-              Yes
+            <button
+              disabled={loading}
+              className={loading ? "disabled" : ""}
+              onClick={action}
+            >
+              {loading ? "Submitting..." : "Yes"}
             </button>
           </div>
         </div>

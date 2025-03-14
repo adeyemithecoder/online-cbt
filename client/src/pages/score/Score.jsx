@@ -74,7 +74,7 @@ const Score = () => {
     await fetchExam(selectedTerm, selectedLevel);
     studentsWithScore(event.target.value, selectedLevel);
   };
-
+  console.log(students);
   return (
     <div className={styles.Score}>
       <h2>Students Exam Scores</h2>
@@ -128,6 +128,7 @@ const Score = () => {
             <table>
               <thead>
                 <tr>
+                  <th>Subject</th>
                   <th>Name</th>
                   <th>Surname</th>
                   <th>Score</th>
@@ -136,6 +137,7 @@ const Score = () => {
               <tbody>
                 {students.map((student) => (
                   <tr key={student.id}>
+                    <td>{student.subjectName}</td>
                     <td>{student.name}</td>
                     <td>{student.surname}</td>
                     <td>{student.score}</td>

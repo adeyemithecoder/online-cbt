@@ -147,8 +147,8 @@ const ExamHistory = () => {
                       <p>Term: {data.termType}</p>
                       <p>Level: {data.level}</p>
                       <p>Total Questions: {stats.totalQuestions}</p>
-                      <p>Total Wrong: {stats.totalFail}</p>
-                      <p>Total Correct: {stats.totalPass}</p>
+                      <p>Total Failed: {stats.totalFail}</p>
+                      <p>Total Passed: {stats.totalPass}</p>
                       <p>Unanswered Questions: {stats.noSelectedOption}</p>
                       {data.questionsAndAnswers.map((qa, qaIndex) => (
                         <div className="each-ques" key={qaIndex}>

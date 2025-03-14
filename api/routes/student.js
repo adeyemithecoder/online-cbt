@@ -563,12 +563,26 @@ studentRoute.put(
   })
 );
 
-//students-with-exam
+//get students-with-exam
 studentRoute.get(
   "/students-with-exam/:schoolId/:examId/:studentLevel",
   expressAsyncHandler(async (req, res) => {
     try {
       const { schoolId, examId, studentLevel } = req.params;
+
+      // Find the exam to get the subjectId
+      const exam = await prisma.exam.findUnique({
+        where: { id: examId },
+        include: { Subject: true }, // Fetch the related subject
+      });
+
+      if (!exam) {
+        return res.status(404).json({ message: "Exam not found" });
+      }
+
+      // Get the subject name
+      const subjectName = exam.Subject.name;
+
       // Find all students matching the schoolId and level
       const students = await prisma.student.findMany({
         where: {
@@ -576,20 +590,23 @@ studentRoute.get(
           level: studentLevel,
         },
       });
-      // Extract the relevant data
-      const filteredStudents = [];
-      for (const student of students) {
-        const subjects = student.subjects ? JSON.parse(student.subjects) : {};
 
-        if (Object.hasOwn(subjects, examId)) {
-          // Push only the required fields into the filtered array
-          filteredStudents.push({
-            name: student.name,
-            surname: student.surname,
-            score: subjects[examId], // Get the score directly from subjects
-          });
-        }
-      }
+      // Extract the relevant data
+      const filteredStudents = students
+        .map((student) => {
+          const subjects = student.subjects ? JSON.parse(student.subjects) : {};
+          if (Object.hasOwn(subjects, examId)) {
+            return {
+              name: student.name,
+              surname: student.surname,
+              score: subjects[examId], // Get the score directly from subjects
+              subjectName, // Include subject name in response
+            };
+          }
+          return null;
+        })
+        .filter(Boolean); // Remove null values
+
       res.status(200).json(filteredStudents);
     } catch (err) {
       res.status(500).json({ message: err.message });

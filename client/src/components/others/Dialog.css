@@ -43,8 +43,19 @@
 }
 .dialogContainer .DialogBackground button {
   background-color: crimson;
+  border-radius: 10px;
   height: 40px;
   width: 60px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+}
+.dialogContainer .DialogBackground button.disabled {
+  cursor: not-allowed;
+  background-color: var(--color-bg);
+  color: white;
+  width: 100px;
 }
 .dialogContainer .DialogBackground .action .red {
   background-color: green;
