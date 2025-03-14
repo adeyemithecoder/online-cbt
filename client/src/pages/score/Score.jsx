@@ -58,12 +58,14 @@ const Score = () => {
   };
 
   const handleTermChange = async (event) => {
+    setExamId(null);
     setSelectedTerm(event.target.value);
     await fetchExam(event.target.value, selectedLevel);
     studentsWithScore(examId, selectedLevel);
   };
 
   const handleLevelChange = async (event) => {
+    setExamId(null);
     setSelectedLevel(event.target.value);
     await fetchExam(selectedTerm, event.target.value);
     studentsWithScore(examId, event.target.value);
@@ -74,7 +76,8 @@ const Score = () => {
     await fetchExam(selectedTerm, selectedLevel);
     studentsWithScore(event.target.value, selectedLevel);
   };
-  console.log(students);
+  console.log(students.length);
+  console.log(examId);
   return (
     <div className={styles.Score}>
       <h2>Students Exam Scores</h2>
@@ -124,10 +127,11 @@ const Score = () => {
         </h1>
       ) : (
         <div>
-          {students.length > 0 && (
+          {students.length > 0 && examId && (
             <table>
               <thead>
                 <tr>
+                  <th>No</th>
                   <th>Subject</th>
                   <th>Name</th>
                   <th>Surname</th>
@@ -135,8 +139,9 @@ const Score = () => {
                 </tr>
               </thead>
               <tbody>
-                {students.map((student) => (
+                {students.map((student, index) => (
                   <tr key={student.id}>
+                    <td>{index + 1}</td>
                     <td>{student.subjectName}</td>
                     <td>{student.name}</td>
                     <td>{student.surname}</td>
@@ -146,9 +151,9 @@ const Score = () => {
               </tbody>
             </table>
           )}
-          {students.length === 0 && (
-            <h2>Available students will appear here.</h2>
-          )}
+          {!examId || students.length === 0 ? (
+            <h2>Students who wrote the selected exam will appear here.</h2>
+          ) : null}
         </div>
       )}
     </div>
