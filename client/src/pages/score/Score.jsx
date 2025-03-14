@@ -74,8 +74,7 @@ const Score = () => {
     await fetchExam(selectedTerm, selectedLevel);
     studentsWithScore(event.target.value, selectedLevel);
   };
-  console.log(exam);
-  console.log(students);
+
   return (
     <div className={styles.Score}>
       <h2>Students Exam Scores</h2>
@@ -102,12 +101,12 @@ const Score = () => {
           <option value="" disabled>
             Select Class
           </option>
-          <option value="js1">Jss 1</option>
-          <option value="js2">Jss 2</option>
-          <option value="js3">Jss 3</option>
-          <option value="ss1">SSS 1</option>
-          <option value="ss2">SSS 2</option>
-          <option value="ss3">SSS 3</option>
+          <option value="js1">Js 1</option>
+          <option value="js2">Js 2</option>
+          <option value="js3">Js 3</option>
+          <option value="ss1">SS 1</option>
+          <option value="ss2">SS 2</option>
+          <option value="ss3">SS 3</option>
         </select>
 
         <select className="select" onChange={handleExamChange}>
@@ -124,7 +123,7 @@ const Score = () => {
           <Spinner size="5rem" />
         </h1>
       ) : (
-        <div className="student-table">
+        <div>
           {students.length > 0 && (
             <table>
               <thead>

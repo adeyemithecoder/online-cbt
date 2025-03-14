@@ -249,6 +249,7 @@ const Subject = () => {
       <table border="">
         <thead>
           <tr>
+            <th>No</th>
             <th>Exam Name</th>
             <th>Visibility</th>
             <th>Duration</th>
@@ -256,8 +257,11 @@ const Subject = () => {
         </thead>
         <tbody>
           {exam.length === 0 && <p>No exam available.</p>}
-          {exam.map((ex) => (
+          {exam.map((ex, index) => (
             <tr key={ex.id}>
+              <td>
+                <span>{index + 1}</span>
+              </td>
               <td>
                 <span>{ex.subjectName}</span>
               </td>
@@ -267,6 +271,9 @@ const Subject = () => {
                   checked={visibilityChanges[ex.id]}
                   onChange={() => handleCheckboxChange(ex.id)}
                 />
+                <span>
+                  {visibilityChanges[ex.id] ? "Visible" : "Not Visible"}
+                </span>
               </td>
               <td>
                 <select
