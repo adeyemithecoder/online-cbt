@@ -12,6 +12,17 @@
   align-items: center;
   justify-content: center;
 }
+.display-div {
+  padding: 20px;
+}
+.display-div .summary {
+  margin: 10px;
+}
+.display-div .each-ques {
+  background-color: var(--color-primary);
+  margin: 10px;
+  color: black;
+}
 .qes-and-ans .logOut {
   background-color: crimson;
   padding: 5px 10px;

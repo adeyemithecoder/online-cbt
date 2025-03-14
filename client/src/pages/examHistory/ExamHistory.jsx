@@ -136,20 +136,23 @@ const ExamHistory = () => {
           {/* Display selected subject's details */}
           {selectedSubject && (
             <div>
-              <h3>Questions and Answers for {selectedSubject}</h3>
+              <h2>Questions and Answers for {selectedSubject}</h2>
               {studentQuestionsAndAnswers
                 .filter((data) => data.examName === selectedSubject)
                 .map((data, index) => {
                   const stats = calculateSubjectStats(data.questionsAndAnswers);
                   return (
                     <div className="display-div" key={index}>
-                      <p>Subject: {data.examName}</p>
-                      <p>Term: {data.termType}</p>
-                      <p>Level: {data.level}</p>
-                      <p>Total Questions: {stats.totalQuestions}</p>
-                      <p>Total Failed: {stats.totalFail}</p>
-                      <p>Total Passed: {stats.totalPass}</p>
-                      <p>Unanswered Questions: {stats.noSelectedOption}</p>
+                      <div className="summary">
+                        <p>Subject: {data.examName}</p>
+                        <p>Term: {data.termType}</p>
+                        <p>Level: {data.level}</p>
+                        <p>Total Questions: {stats.totalQuestions}</p>
+                        <p>Total Failed: {stats.totalFail}</p>
+                        <p>Total Passed: {stats.totalPass}</p>
+                        <p>Unanswered Questions: {stats.noSelectedOption}</p>
+                      </div>
+
                       {data.questionsAndAnswers.map((qa, qaIndex) => (
                         <div className="each-ques" key={qaIndex}>
                           <p>
