@@ -49,6 +49,7 @@ const ExamHistory = () => {
   }, [schoolId]);
 
   const handleSubjectClick = (subject) => {
+    console.log(subject);
     setSelectedSubject(subject);
   };
 
@@ -88,7 +89,12 @@ const ExamHistory = () => {
 
   // Extract unique subjects (exam names) for rendering buttons
   const subjects = [
-    ...new Set(studentQuestionsAndAnswers.map((item) => item.examName)),
+    ...new Map(
+      studentQuestionsAndAnswers.map((item) => [
+        `${item.examName}-${item.termType}`,
+        { examName: item.examName, termType: item.termType },
+      ])
+    ).values(),
   ];
 
   const formatQuestionToJSX = (text) => {
@@ -109,6 +115,7 @@ const ExamHistory = () => {
         <Spinner size="5rem" />
       </h1>
     );
+  console.log(subjects);
   return (
     <>
       {allowStudent ? (
@@ -125,7 +132,7 @@ const ExamHistory = () => {
             {subjects.length > 0 ? (
               subjects.map((subject, index) => (
                 <button key={index} onClick={() => handleSubjectClick(subject)}>
-                  {subject}
+                  {subject.examName} - {subject.termType} Term
                 </button>
               ))
             ) : (
@@ -136,9 +143,16 @@ const ExamHistory = () => {
           {/* Display selected subject's details */}
           {selectedSubject && (
             <div>
-              <h2>Questions and Answers for {selectedSubject}</h2>
+              <h2>
+                Questions and Answers for {selectedSubject.examName} -{" "}
+                {selectedSubject.termType} Term
+              </h2>
               {studentQuestionsAndAnswers
-                .filter((data) => data.examName === selectedSubject)
+                .filter(
+                  (data) =>
+                    data.examName === selectedSubject.examName &&
+                    data.termType === selectedSubject.termType
+                )
                 .map((data, index) => {
                   const stats = calculateSubjectStats(data.questionsAndAnswers);
                   return (

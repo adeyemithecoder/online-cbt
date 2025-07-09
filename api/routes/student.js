@@ -406,7 +406,6 @@ studentRoute.post(
       });
 
       if (!studentByUsername) {
-        console.log("Username not found");
         res.status(404).send({
           message: "Username not found",
         });
@@ -418,7 +417,6 @@ studentRoute.post(
       });
 
       if (!student) {
-        console.log("Wrong password");
         res.status(404).send({
           message: "Wrong password",
         });

@@ -77,7 +77,6 @@ examRoute.get(
   expressAsyncHandler(async (req, res) => {
     try {
       const { level, termType, schoolId } = req.query;
-      console.log(level, termType, schoolId);
       // Validate query parameters
       if (!level || !termType || !schoolId) {
         return res.status(400).json({
@@ -144,7 +143,6 @@ examRoute.get(
   "/visible-true-exams/:schoolId",
   expressAsyncHandler(async (req, res) => {
     const { schoolId } = req.params;
-    console.log(schoolId);
     try {
       const exams = await prisma.exam.findMany({
         where: {
@@ -242,7 +240,6 @@ examRoute.get(
   expressAsyncHandler(async (req, res) => {
     try {
       const { id } = req.params;
-      console.log(id);
       // Validate exam ID
       if (!id) {
         return res.status(400).json({
@@ -429,14 +426,13 @@ examRoute.put(
     try {
       const { questionId } = req.params;
       const { question, options, correctAnswer, examId } = req.body;
-      console.log(options);
       const updatedQuestion = await prisma.question.update({
         where: { id: questionId },
         data: {
-          question, // Update question text
-          options, // Update options (e.g., an array of answers)
-          correctAnswer, // Update correct answer
-          examId, // (Optional) Update associated examId
+          question,
+          options,
+          correctAnswer,
+          examId,
         },
       });
 

@@ -47,6 +47,7 @@ const Login = () => {
       [name]: value.trim(),
     });
   };
+
   const nameRef = useRef(null);
   useEffect(() => {
     const user = localStorage.getItem("loggedInStudent");
