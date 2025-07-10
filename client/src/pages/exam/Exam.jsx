@@ -148,6 +148,7 @@ const Exam = () => {
       checkIfScoreExist(storedObject.id);
     }
   }, [navigate, checkIfScoreExist]);
+
   useEffect(() => {
     if (redirectAfterAlert && !openAlert) {
       navigate("/");

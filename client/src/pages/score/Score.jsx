@@ -48,7 +48,6 @@ const Score = () => {
       const { data } = await axios.get(
         `${apiUrl}/api/students/students-with-exam/${schoolId}/${examId}/${selectedLevel}`
       );
-      console.log(data);
       setStudents(data);
     } catch (error) {
       console.log(getError(error));
@@ -76,8 +75,31 @@ const Score = () => {
     await fetchExam(selectedTerm, selectedLevel);
     studentsWithScore(event.target.value, selectedLevel);
   };
-  console.log(students.length);
-  console.log(examId);
+
+  const handleDeleteExam = async (studentId) => {
+    if (!examId) return;
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this exam score?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      setLoading(true);
+      console.log(studentId);
+      console.log(examId);
+      await axios.delete(
+        `${apiUrl}/api/students/delete-student-subject/${studentId}/${examId}`
+      );
+      // Refetch students after deletion
+      await studentsWithScore(examId, selectedLevel);
+    } catch (error) {
+      console.error("Error deleting exam from student:", getError(error));
+    } finally {
+      setLoading(false);
+    }
+  };
+  console.log(students);
   return (
     <div className={styles.Score}>
       <h2>Students Exam Scores</h2>
@@ -136,6 +158,7 @@ const Score = () => {
                   <th>Name</th>
                   <th>Surname</th>
                   <th>Score</th>
+                  <th>Delete Exam</th>
                 </tr>
               </thead>
               <tbody>
@@ -146,6 +169,11 @@ const Score = () => {
                     <td>{student.name}</td>
                     <td>{student.surname}</td>
                     <td>{student.score}</td>
+                    <td>
+                      <button onClick={() => handleDeleteExam(student.id)}>
+                        Delete Exam
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

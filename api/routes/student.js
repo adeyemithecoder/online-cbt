@@ -561,6 +561,47 @@ studentRoute.put(
   })
 );
 
+studentRoute.delete(
+  "/delete-student-subject/:studentId/:examId",
+  expressAsyncHandler(async (req, res) => {
+    try {
+      const { studentId, examId } = req.params;
+
+      const student = await prisma.student.findUnique({
+        where: { id: studentId },
+      });
+
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+
+      const existingSubjects = student.subjects
+        ? JSON.parse(student.subjects)
+        : {};
+
+      // Delete the specific examId from subjects
+      if (existingSubjects[examId]) {
+        delete existingSubjects[examId];
+      } else {
+        return res
+          .status(400)
+          .json({ message: "Exam ID not found in subjects" });
+      }
+
+      const updatedStudent = await prisma.student.update({
+        where: { id: studentId },
+        data: {
+          subjects: JSON.stringify(existingSubjects),
+        },
+      });
+
+      res.status(200).json(updatedStudent);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  })
+);
+
 //get students-with-exam
 studentRoute.get(
   "/students-with-exam/:schoolId/:examId/:studentLevel",
@@ -596,6 +637,7 @@ studentRoute.get(
           if (Object.hasOwn(subjects, examId)) {
             return {
               name: student.name,
+              id: student.id,
               surname: student.surname,
               score: subjects[examId], // Get the score directly from subjects
               subjectName, // Include subject name in response
