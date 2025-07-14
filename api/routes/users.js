@@ -7,7 +7,6 @@ import expressAsyncHandler from "express-async-handler";
 userRoute.post(
   "/create-school",
   expressAsyncHandler(async (req, res) => {
-    console.log(req.body);
     const { fullName, name, viewExamHistory, logo } = req.body;
     try {
       const schoolAlreadyExist = await prisma.school.findFirst({
@@ -38,7 +37,6 @@ userRoute.get(
   "/school/:id",
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
-    console.log(id);
     try {
       const school = await prisma.school.findUnique({
         where: { id },
@@ -128,7 +126,6 @@ userRoute.post(
       });
 
       if (!userByUsername) {
-        console.log("Username not found");
         res.status(404).send({
           message: "Username not found",
         });
@@ -140,7 +137,6 @@ userRoute.post(
       });
 
       if (!user) {
-        console.log("Wrong password");
         res.status(404).send({
           message: "Wrong password",
         });

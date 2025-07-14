@@ -169,7 +169,7 @@ const Exam = () => {
         <Spinner size="5rem" />
       </h1>
     );
-
+  console.log(exams);
   return (
     <>
       {openDialog && (
@@ -198,7 +198,8 @@ const Exam = () => {
                 key={exam.id}
                 value={exam.id}
               >
-                {exam.subjectName}
+                {exam.level.toUpperCase()} {exam.subjectName.toUpperCase()}{" "}
+                {exam.termType} TERM
               </option>
             ))}
           </select>

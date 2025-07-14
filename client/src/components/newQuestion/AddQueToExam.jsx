@@ -36,6 +36,7 @@ const AddQueToExam = ({ newQuestions, setQuestions }) => {
       console.log(error.message);
     }
   };
+
   const handleTermChange = async (event) => {
     const selectedTerm = event.target.value;
     setSelectedTerm(selectedTerm);
@@ -70,6 +71,7 @@ const AddQueToExam = ({ newQuestions, setQuestions }) => {
       alert(getError(error));
     }
     setLoading(false);
+    setExamId(null);
   };
 
   const handleExamChange = (event) => {
