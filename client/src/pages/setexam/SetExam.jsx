@@ -15,8 +15,6 @@ const SetExam = () => {
         .filter((item) => Array.isArray(item) && item[0])
         .slice(1); // Remove the first item (header row)
 
-      console.log(filteredData);
-
       // Check for any incomplete questions
       const incompleteQuestions = filteredData.some((item) => item.length < 6);
       if (incompleteQuestions) {

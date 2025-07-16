@@ -164,9 +164,6 @@ const Subject = () => {
         visible: visibilityChanges[id],
         examDuration: durationChanges[id],
       }));
-
-      console.log(updates); // Debug log
-
       await axios.put(`${apiUrl}/api/exams/update-visibility-duration`, {
         updates,
       });
@@ -283,6 +280,7 @@ const Subject = () => {
                   <option disabled value="">
                     Select Time Duration
                   </option>
+                  <option value={25 * 60}>25 minutes</option>
                   <option value={30 * 60}>30 minutes</option>
                   <option value={40 * 60}>40 minutes</option>
                   <option value={50 * 60}>50 minutes</option>
