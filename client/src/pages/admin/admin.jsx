@@ -13,7 +13,6 @@ const Admin = () => {
   useEffect(() => {
     const fetchSchool = async () => {
       try {
-        console.log(schoolId);
         const { data } = await axios.get(
           `${apiUrl}/api/users/school/${schoolId}`
         );
@@ -31,10 +30,7 @@ const Admin = () => {
     )
       return;
     try {
-      const { data } = await axios.delete(
-        `${apiUrl}/api/students/delete-answers/${schoolId}`
-      );
-      console.log(data);
+      await axios.delete(`${apiUrl}/api/students/delete-answers/${schoolId}`);
     } catch (error) {
       console.error(getError(error));
     }
@@ -48,7 +44,6 @@ const Admin = () => {
       await axios.put(`${apiUrl}/api/users/school/${schoolId}`, {
         viewExamHistory: newAllowStudent, // Update `viewExamHistory` in the backend
       });
-      console.log("viewExamHistory updated successfully");
     } catch (error) {
       console.error("Error updating viewExamHistory:", error);
     }

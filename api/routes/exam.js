@@ -49,8 +49,6 @@ examRoute.delete(
   expressAsyncHandler(async (req, res) => {
     try {
       const { id } = req.params;
-
-      // Check if the exam exists
       const existingExam = await prisma.exam.findUnique({
         where: { id },
       });
@@ -58,8 +56,6 @@ examRoute.delete(
       if (!existingExam) {
         return res.status(404).json({ message: "Exam not found." });
       }
-
-      // Delete the exam
       await prisma.exam.delete({
         where: { id },
       });
