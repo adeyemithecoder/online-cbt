@@ -17,7 +17,7 @@ app.use("/api/users", userRoute);
 app.use("/api/subjects", subjectRoute);
 app.use("/api/exams", examRoute);
 
-app.get("/", (req, res) => res.send("welcome to my blog app"));
+app.get("/", (req, res) => res.send("welcome to blog app"));
 app.use((err, req, res, next) => {
   res.status(500).send({ message: `My Mistake= ${err.message}` });
 });

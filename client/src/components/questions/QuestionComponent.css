@@ -1,0 +1,131 @@
+.questions-components {
+  padding: 15px;
+}
+.count-container {
+  display: flex;
+  justify-content: space-around;
+  font-size: 15px;
+}
+
+.all-subject {
+  display: flex;
+  color: white;
+  justify-content: space-around;
+  margin-top: 4px;
+  width: 70%;
+}
+
+.all-subject span {
+  background-color: crimson;
+  border-radius: 10px;
+  padding: 4px 8px;
+  font-weight: bold;
+  text-transform: capitalize;
+  font-size: 1.2em;
+}
+.question-container {
+  display: flex;
+  margin-top: 5px;
+  display: none;
+}
+.question-container.active {
+  display: flex;
+}
+
+.question-container h2 {
+  margin-right: 20px;
+}
+.each-question {
+  margin-top: 10px;
+  margin-right: 25%;
+}
+.each-question ul {
+  width: max-content;
+  margin-top: 10px;
+}
+.underline {
+  text-decoration: underline;
+}
+.each-question ul li {
+  max-width: 600px;
+}
+.each-question ul li label {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.each-question ul li span {
+  margin-left: 14px;
+  cursor: pointer;
+  width: 100%;
+}
+input[type="radio"] {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+}
+.next-prev-button {
+  display: flex;
+  justify-content: space-around;
+  width: 60%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.next-prev-button button {
+  background-color: var(--color-primary);
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: none;
+  font-size: 19px;
+  cursor: pointer;
+}
+.next-prev-button button:active {
+  background-color: var(--color-primary-variant);
+}
+.question-number {
+  margin: 8px;
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  grid-gap: 5px;
+  width: 70%;
+}
+.question-number button {
+  height: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: var(--color-light);
+}
+.question-number button.active {
+  height: 30px;
+  cursor: pointer;
+  background-color: var(--color-primary-variant);
+}
+.question-number button.answered {
+  height: 30px;
+  cursor: pointer;
+  background-color: rgb(5, 247, 5);
+}
+
+.submit-btn,
+.add-question-button {
+  background-color: var(--color-primary);
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: none;
+  color: black;
+  font-weight: bold;
+  font-size: 19px;
+  margin-left: 20px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+.submit-btn:active {
+  background-color: var(--color-bg-deep);
+}
+.time {
+  background-color: var(--color-primary-variant);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 160px;
+}

@@ -1,0 +1,58 @@
+.setexam-container {
+  width: 100%;
+}
+
+.setexam-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+.online-data {
+  display: flex;
+}
+.all_online-subjects {
+  /* background-color: red; */
+  width: 400px;
+}
+.table-container {
+  /* background-color: yellow; */
+  width: 100%;
+}
+.setexam-container table thead tr th {
+  font-weight: bold;
+  color: var(--color-bg-deep);
+  background-color: var(--color-primary);
+  border: 2px solid var(--color-bg-deep);
+  text-align: center;
+}
+.setexam-container table tbody tr td {
+  border: 2px solid var(--color-primary-variant);
+}
+.setexam-container .btnContainer {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+tbody .icon {
+  background-color: transparent;
+  color: var(--color-primary);
+  width: 100%;
+  display: flex;
+  place-content: center;
+  font-size: 1.8em;
+  cursor: pointer;
+}
+
+.setexam-container form {
+  width: 100%;
+}
+.setexam-container form input {
+  transform: scale(1.4);
+  margin-right: 8px;
+}
+.available-subject-h2 {
+  background-color: var(--color-primary-variant);
+  text-align: center;
+  margin: 20px;
+}

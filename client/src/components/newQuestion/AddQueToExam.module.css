@@ -1,0 +1,25 @@
+.container {
+  text-align: center;
+  margin: 20px;
+}
+.container select {
+  padding: 5px;
+  padding-left: 10px;
+  font-size: 1.5em;
+  border-radius: 20px;
+  outline: none;
+  border: none;
+  margin: 0 10px;
+  width: 300px;
+}
+.container button {
+  padding: 7px 10px;
+  font-size: 1.2em;
+  border-radius: 10px;
+  color: black;
+  font-weight: bold;
+  outline: none;
+  border: none;
+  margin-left: 20px;
+  background-color: var(--color-primary);
+}
