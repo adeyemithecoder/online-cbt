@@ -1,0 +1,87 @@
+.register {
+  /* height: 10vh; */
+  display: flex;
+  place-content: center;
+  margin-top: 20px;
+}
+
+form {
+  margin: auto;
+  background-color: var(--color-bg-deep);
+  border-radius: 10px;
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+  width: 400px;
+  color: var(--color-white);
+}
+.link-container {
+  display: flex;
+  color: var(--color-white);
+  font-size: 15px;
+  text-decoration: none;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+.link {
+  color: var(--color-primary);
+}
+h1 {
+  text-align: center;
+  color: var(--color-whitey);
+}
+form button {
+  width: 80%;
+  margin: 0 auto;
+  height: 40px;
+  border: none;
+  background: var(--color-bg-deep);
+  color: white;
+  border-radius: 10px;
+  border: 3px solid var(--color-primary-variant);
+  font-weight: bold;
+  font-size: 20px;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-bottom: 15px;
+  transition: all 0.5s ease-in-out;
+}
+form button:hover {
+  background-color: var(--color-primary);
+  color: var(--color-bg);
+}
+.select-container {
+  height: 50px;
+  width: 80%;
+  text-align: center;
+  font-weight: bold;
+  text-align: center;
+  margin: 0 auto;
+  margin-top: 10px;
+}
+.select-container select {
+  cursor: pointer;
+  height: 40px;
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid gray;
+  font-size: 20px;
+  background-color: white;
+  color: black;
+  text-align: center;
+  font-weight: bold;
+}
+.select-container select option {
+  background-color: var(--color-bg);
+  color: var(--color-white);
+  border: 1px solid gray;
+  font-size: 25px;
+}
+.error {
+  color: red;
+  text-align: center;
+  font-size: 1.4em;
+  background-color: var(--color-primary);
+  width: 70%;
+  margin: auto;
+}

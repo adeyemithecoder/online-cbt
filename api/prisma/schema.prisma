@@ -1,0 +1,532 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
+
+enum TermType {
+  FIRST
+  SECOND
+  THIRD
+}
+
+// ─────────────────────────────────────────────
+// EXISTING MODELS (unchanged)
+// ─────────────────────────────────────────────
+
+model School {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  fullName        String?
+  name            String   @unique
+  logo            String?
+  classes         String[] @default([])
+  viewExamHistory Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  // Existing relations
+  users    User[]
+  students Student[]
+  subjects Subject[]
+  exams    Exam[]
+  answers  Answer[]
+
+  // Accounting relations
+  chartOfAccounts  ChartOfAccount[]
+  journalEntries   JournalEntry[]
+  feeStructures    FeeStructure[]
+  studentFees      StudentFee[]
+  feePayments      FeePayment[]
+  expenses         Expense[]
+  auditLogs        AuditLog[]
+  academicSessions AcademicSession[]
+  loans            Loan[]
+  donations        Donation[]
+}
+
+model User {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  username String  @unique
+  password String
+  name     String?
+  gender   String?
+  role     Role    @default(USER)
+  schoolId String? @db.ObjectId
+  School   School? @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  // Accounting relations
+  journalEntries      JournalEntry[]
+  expenses            Expense[]
+  auditLogs           AuditLog[]
+  feePaymentsRecorded FeePayment[]
+}
+
+model Student {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  level    String
+  password String
+  name     String
+  username String   @unique
+  surname  String
+  subjects Json?
+  answers  Answer[]
+  schoolId String   @db.ObjectId
+  School   School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  // Accounting relations
+  studentFees StudentFee[]
+  feePayments FeePayment[]
+}
+
+model Subject {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  schoolId String @db.ObjectId
+  School   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  exams    Exam[]
+
+  @@unique([name, schoolId])
+}
+
+model Exam {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  visible      Boolean
+  examDuration Int
+  questions    Question[]
+  termType     TermType
+  level        String
+  subjectId    String     @db.ObjectId
+  Subject      Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  schoolId     String     @db.ObjectId
+  School       School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  answers      Answer[]   @relation("ExamToAnswers")
+}
+
+model Question {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  question      String
+  options       String[]
+  correctAnswer String
+  examId        String   @db.ObjectId
+  Exam          Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+}
+
+model Answer {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  studentId String  @db.ObjectId
+  Student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  examId    String  @db.ObjectId
+  Exam      Exam    @relation("ExamToAnswers", fields: [examId], references: [id], onDelete: Cascade)
+  schoolId  String  @db.ObjectId
+  School    School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  answers   Json    @default("[]")
+}
+
+// ─────────────────────────────────────────────
+// ACCOUNTING MODELS (REFINED & SAFE)
+// ─────────────────────────────────────────────
+
+model AcademicSession {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  term      TermType
+  startDate DateTime
+  endDate   DateTime
+  isCurrent Boolean  @default(false)
+
+  // ✅ NEW (VERY IMPORTANT)
+  isLocked Boolean @default(false)
+
+  schoolId String @db.ObjectId
+  School   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  feeStructures  FeeStructure[]
+  studentFees    StudentFee[]
+  feePayments    FeePayment[]
+  expenses       Expense[]
+  journalEntries JournalEntry[]
+  loans          Loan[]
+  donations      Donation[]
+
+  @@unique([name, term, schoolId])
+}
+
+// ─────────────────────────────────────────────
+
+model ChartOfAccount {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  code          String
+  name          String
+  description   String?
+  accountType   AccountType
+  normalBalance NormalBalance
+  isActive      Boolean       @default(true)
+
+  schoolId String @db.ObjectId
+  School   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ✅ CORE ACCOUNTING
+  journalLines JournalLine[]
+
+  // ✅ BUSINESS LINKS
+  feeStructures FeeStructure[] @relation("FeeRevenueAccount")
+  expenses      Expense[]      @relation("ExpenseAccount")
+
+  // ✅ LOAN RELATIONS
+  loanLiabilities Loan[] @relation("LoanLiabilityAccount")
+  loanCash        Loan[] @relation("CashAccountLoan")
+
+  // ✅ CASH ACCOUNT USAGE
+  feePaymentCash FeePayment[] @relation("CashAccountFeePayment")
+  expenseCash    Expense[]    @relation("CashAccountExpense")
+  donationCash   Donation[]   @relation("CashAccountDonation")
+
+  // ✅ DONATION REVENUE
+  donationRevenue Donation[] @relation("DonationRevenueAccount")
+
+  @@unique([code, schoolId])
+}
+
+// ─────────────────────────────────────────────
+// BUSINESS INPUT MODELS (CONTROLLED → AUTO JOURNAL)
+// ─────────────────────────────────────────────
+
+model Loan {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  amount        Float
+  lender        String
+  description   String?
+  dateReceived  DateTime
+  repaymentDate DateTime?
+  status        LoanStatus
+
+  // 🔑 CRITICAL ACCOUNTING LINKS
+  liabilityAccountId String         @db.ObjectId
+  LiabilityAccount   ChartOfAccount @relation("LoanLiabilityAccount", fields: [liabilityAccountId], references: [id])
+
+  cashAccountId String         @db.ObjectId
+  CashAccount   ChartOfAccount @relation("CashAccountLoan", fields: [cashAccountId], references: [id])
+
+  journalEntryId String? @db.ObjectId
+
+  schoolId String @db.ObjectId
+  School   School @relation(fields: [schoolId], references: [id])
+
+  sessionId String          @db.ObjectId
+  Session   AcademicSession @relation(fields: [sessionId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────
+
+model Donation {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  donorName   String?
+  amount      Float
+  description String?
+  date        DateTime
+
+  // 🔑 ACCOUNTING LINKS
+  revenueAccountId String         @db.ObjectId
+  RevenueAccount   ChartOfAccount @relation("DonationRevenueAccount", fields: [revenueAccountId], references: [id])
+
+  cashAccountId String         @db.ObjectId
+  CashAccount   ChartOfAccount @relation("CashAccountDonation", fields: [cashAccountId], references: [id])
+
+  journalEntryId String? @db.ObjectId
+
+  schoolId String @db.ObjectId
+  School   School @relation(fields: [schoolId], references: [id])
+
+  sessionId String          @db.ObjectId
+  Session   AcademicSession @relation(fields: [sessionId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────
+// CORE ACCOUNTING ENGINE
+// ─────────────────────────────────────────────
+
+model JournalEntry {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  entryNumber String
+  date        DateTime
+  description String
+  reference   String?
+
+  status JournalEntryStatus @default(DRAFT)
+  source JournalSource
+
+  postedAt DateTime?
+
+  // ✅ FIXED SELF-RELATION
+  reversalOfId String?        @db.ObjectId
+  ReversalOf   JournalEntry?  @relation("Reversal", fields: [reversalOfId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reversedBy   JournalEntry[] @relation("Reversal")
+
+  schoolId String @db.ObjectId
+  School   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  sessionId String          @db.ObjectId
+  Session   AcademicSession @relation(fields: [sessionId], references: [id])
+
+  createdById String @db.ObjectId
+  CreatedBy   User   @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lines JournalLine[]
+
+  @@unique([entryNumber, schoolId])
+  @@index([sessionId])
+}
+
+// ─────────────────────────────────────────────
+
+model JournalLine {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  entryType EntryType
+  amount    Float
+  narration String?
+
+  journalEntryId String       @db.ObjectId
+  JournalEntry   JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+
+  accountId String         @db.ObjectId
+  Account   ChartOfAccount @relation(fields: [accountId], references: [id])
+
+  @@index([accountId])
+}
+
+// ─────────────────────────────────────────────
+// SCHOOL FINANCE LAYER
+// ─────────────────────────────────────────────
+
+model FeeStructure {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  level       String? // ← optional now, null means applies to ALL levels
+  isAllLevels Boolean   @default(false) // ← true = school-wide fee (transport, sport etc)
+  amount      Float
+  dueDate     DateTime?
+  isActive    Boolean   @default(true)
+
+  schoolId String @db.ObjectId
+  School   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  sessionId String          @db.ObjectId
+  Session   AcademicSession @relation(fields: [sessionId], references: [id])
+
+  revenueAccountId String         @db.ObjectId
+  RevenueAccount   ChartOfAccount @relation("FeeRevenueAccount", fields: [revenueAccountId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentFees StudentFee[]
+
+  @@unique([name, level, sessionId, schoolId])
+}
+
+// ─────────────────────────────────────────────
+
+model StudentFee {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  amountCharged Float
+  amountPaid    Float  @default(0)
+
+  status FeeStatus @default(UNPAID)
+
+  studentId String  @db.ObjectId
+  Student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  feeStructureId String       @db.ObjectId
+  FeeStructure   FeeStructure @relation(fields: [feeStructureId], references: [id])
+
+  sessionId String          @db.ObjectId
+  Session   AcademicSession @relation(fields: [sessionId], references: [id])
+
+  schoolId String @db.ObjectId
+  School   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  payments FeePayment[]
+
+  @@unique([studentId, feeStructureId])
+}
+
+model AuditLog {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  action   String // CREATE, UPDATE, DELETE, POST, REVERSE
+  entity   String // JournalEntry, Expense, FeePayment etc
+  entityId String
+
+  oldData Json?
+  newData Json?
+
+  userId String @db.ObjectId
+  User   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  school    School?  @relation(fields: [schoolId], references: [id])
+  schoolId  String?  @db.ObjectId
+
+  // ✅ OPTIONAL INDEX (for performance)
+  @@index([entity, entityId])
+}
+
+// ─────────────────────────────────────────────
+
+model FeePayment {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  receiptNumber String   @unique
+  amountPaid    Float
+  paymentDate   DateTime
+
+  paymentMethod PaymentMethod
+  reference     String?
+  note          String?
+
+  // 🔑 CRITICAL FIX (ACCOUNTING)
+  cashAccountId String         @db.ObjectId
+  CashAccount   ChartOfAccount @relation("CashAccountFeePayment", fields: [cashAccountId], references: [id])
+
+  studentId String  @db.ObjectId
+  Student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  studentFeeId String     @db.ObjectId
+  StudentFee   StudentFee @relation(fields: [studentFeeId], references: [id], onDelete: Cascade)
+
+  sessionId String          @db.ObjectId
+  Session   AcademicSession @relation(fields: [sessionId], references: [id])
+
+  schoolId       String  @db.ObjectId
+  School         School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  journalEntryId String? @db.ObjectId
+  recordedById   String  @db.ObjectId
+  RecordedBy     User    @relation(fields: [recordedById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+}
+
+// ─────────────────────────────────────────────
+
+model Expense {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  amount      Float
+  expenseDate DateTime
+
+  paymentMethod PaymentMethod
+  vendor        String?
+  invoiceNumber String?
+  receiptUrl    String?
+
+  status ExpenseStatus @default(PENDING)
+
+  // ✅ NEW (track approval time)
+  approvedAt DateTime?
+
+  expenseAccountId String         @db.ObjectId
+  ExpenseAccount   ChartOfAccount @relation("ExpenseAccount", fields: [expenseAccountId], references: [id])
+
+  cashAccountId String         @db.ObjectId
+  CashAccount   ChartOfAccount @relation("CashAccountExpense", fields: [cashAccountId], references: [id])
+
+  schoolId String @db.ObjectId
+  School   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  sessionId String          @db.ObjectId
+  Session   AcademicSession @relation(fields: [sessionId], references: [id])
+
+  createdById String @db.ObjectId
+  CreatedBy   User   @relation(fields: [createdById], references: [id])
+
+  approvedById   String? @db.ObjectId
+  journalEntryId String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sessionId])
+}
+
+enum JournalEntryStatus {
+  DRAFT
+  POSTED
+  REVERSED
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+enum NormalBalance {
+  DEBIT
+  CREDIT
+}
+
+enum EntryType {
+  DEBIT
+  CREDIT
+}
+
+enum LoanStatus {
+  ACTIVE
+  PAID
+}
+
+enum JournalSource {
+  MANUAL
+  SYSTEM
+  FEE_PAYMENT
+  EXPENSE
+  LOAN
+  DONATION
+}
+
+enum FeeStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  POS
+  ONLINE
+  OTHER
+}
+
+enum ExpenseStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

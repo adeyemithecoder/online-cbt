@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  /* ── Gold palette ─────────────────────────────────────────────────────── */
+  --color-bg: #1f1f38;
+  --color-bg-deep: #2c2c6c;
+  --color-primary: #4db5ff;
+  --color-primary-variant: rgba(77, 181, 255, 0.4);
+  --color-white: #fff;
+  --color-light: rgba(255, 255, 255, 0.6);
+  --color-success: #22c55e;
+  --color-success-variant: rgba(34, 197, 94, 0.2);
+  --color-border: rgba(255, 255, 255, 0.1);
+
+  --color-danger: #ef4444;
+  --color-danger-variant: rgba(239, 68, 68, 0.2);
+
+  --color-warning: #f59e0b;
+  --color-warning-variant: rgba(245, 158, 11, 0.2);
+
+  --color-info: var(--color-primary);
+  --color-info-variant: var(--color-primary-variant);
+
+  /* ── Border radius scale ──────────────────────────────────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BASE STYLES
+   ══════════════════════════════════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-ink-950);
+  color: var(--color-ink-50);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary-variant);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-gold-500) 30%, transparent);
+  color: var(--color-gold-200);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ANIMATIONS  —  referenced via className="animate-*"
+   ══════════════════════════════════════════════════════════════════════════ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out both;
+}
+.animate-slide-up {
+  animation: slideUp 0.35s ease-out both;
+}
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out both;
+}
+.animate-scale-in {
+  animation: scaleIn 0.25s ease-out both;
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.stagger-1 {
+  animation-delay: 0.05s;
+}
+.stagger-2 {
+  animation-delay: 0.1s;
+}
+.stagger-3 {
+  animation-delay: 0.15s;
+}
+.stagger-4 {
+  animation-delay: 0.2s;
+}
+.stagger-5 {
+  animation-delay: 0.25s;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SHIMMER SKELETON  —  className="shimmer"
+   ══════════════════════════════════════════════════════════════════════════ */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-ink-800) 25%,
+    var(--color-ink-700) 50%,
+    var(--color-ink-800) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+}

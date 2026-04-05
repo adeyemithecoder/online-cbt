@@ -1,0 +1,88 @@
+.AllStudents table {
+  width: 95%;
+  margin: auto;
+}
+.AllStudents h2,
+.AllStudents h3 {
+  text-align: center;
+}
+.AllStudents table thead tr th {
+  background-color: var(--color-primary);
+  color: black;
+  margin-bottom: 20px;
+  font-size: 1.3em;
+  padding: 5px;
+  padding-bottom: 10px;
+}
+
+.AllStudents .selectContainer {
+  text-align: center;
+}
+.AllStudents select {
+  margin: 10px;
+  outline: none;
+  cursor: pointer;
+  height: 50px;
+  width: 300px;
+  border-radius: 10px;
+  font-size: 20px;
+  background-color: var(--color-primary-variant);
+  color: var(--color-white);
+  text-align: center;
+}
+.AllStudents select option {
+  background-color: var(--color-bg);
+  color: var(--color-white);
+  border: 1px solid gray;
+  font-size: 25px;
+  text-align: center;
+}
+.actions {
+  display: flex;
+  justify-content: space-around;
+}
+
+.AllStudents .actions button {
+  padding: 3px 10px;
+  font-weight: bold;
+  border-radius: 5px;
+  font-size: 15px;
+  margin: 5px;
+}
+.AllStudents .actions .delete {
+  background-color: crimson;
+  color: white;
+}
+.actions .edit {
+  background-color: lightgreen;
+}
+.editstudent-container {
+  height: 85vh;
+  display: flex;
+}
+.editstudent-container form {
+  padding: 25px 30px;
+}
+.editstudent-container form label {
+  display: block;
+}
+.editstudent-container form input,
+.editstudent-container form select {
+  height: 30px;
+  margin: 5px;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 20px;
+  padding-left: 20px;
+  width: 100%;
+  background-color: white;
+  color: black;
+}
+.editstudent-container form select option {
+  text-align: left;
+}
+.editstudent-container form button {
+  width: 100%;
+  height: 30px;
+  border-radius: 20px;
+}

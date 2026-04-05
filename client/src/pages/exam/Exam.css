@@ -1,0 +1,88 @@
+.exam-containere {
+  max-width: 1200px;
+  margin: auto;
+}
+.editexam-container form {
+  width: 80%;
+  max-width: 800px;
+  padding: 10px;
+}
+.editexam-container form h2 {
+  text-align: center;
+}
+.editexam-container form input {
+  width: 100%;
+  font-size: 1.2em;
+}
+.editexam-container form select {
+  width: 100%;
+  font-size: 1.2em;
+}
+.editexam-container form button {
+  width: 100%;
+}
+.editexam-container form label {
+  background-color: var(--color-bg);
+  color: var(--color-primary);
+}
+.editexam-container form textarea {
+  width: 100%;
+  font-weight: bold;
+  font-size: 1.7em;
+}
+.correct-ans {
+  margin-top: 10px;
+}
+.correct-ans input {
+  display: block;
+}
+.notInTheClass {
+  display: none;
+}
+.admin {
+  display: block;
+}
+
+.exam-select-container {
+  height: 50px;
+  margin: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+.exam-select-container select {
+  cursor: pointer;
+  height: 40px;
+  width: 400px;
+  border-radius: 10px;
+  border: 1px solid gray;
+  font-size: 20px;
+  background-color: var(--color-bg);
+  color: var(--color-white);
+  padding-left: 10px;
+}
+.exam-select-container .logout {
+  background-color: crimson;
+  padding: 0 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.2em;
+  border-radius: 20px;
+  color: white;
+}
+.exam-select-container .examHistory {
+  background-color: rgb(69, 230, 69);
+  padding: 0 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.2em;
+  border-radius: 20px;
+  color: black;
+}
+.qes-and-ans-select-container select option {
+  background-color: var(--color-bg);
+  color: var(--color-white);
+  border: 1px solid gray;
+  font-size: 20px;
+  text-align: left;
+  padding: 5px;
+}
