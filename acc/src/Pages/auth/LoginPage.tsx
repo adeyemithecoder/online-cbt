@@ -23,8 +23,15 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
     try {
-      const res = await axios.post(`${apiUrl}/login-user`, form);
+      const payload = {
+        username: form.username.trim(),
+        password: form.password.trim(),
+      };
+
+      const res = await axios.post(`${apiUrl}/login-user`, payload);
+
       const role = res.data.role;
       setAccountingAuth({
         userId: res.data.userId,
@@ -34,6 +41,7 @@ export default function LoginPage() {
         role,
         classes: res.data.classes || [],
       });
+
       navigate(role === "SUPER_ADMIN" ? "/super-admin" : "/");
     } catch (err: any) {
       setError(
