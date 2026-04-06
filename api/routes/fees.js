@@ -381,6 +381,7 @@ feesRoute.get(
 );
 
 // ─── Get Outstanding Fees (school-wide or per session) ────────────────────
+// ─── Get Outstanding Fees (school-wide or per session) ─────────────────────
 feesRoute.get(
   "/student-fees/outstanding/:schoolId",
   expressAsyncHandler(async (req, res) => {
@@ -394,13 +395,193 @@ feesRoute.get(
         ...(sessionId ? { sessionId } : {}),
       },
       include: {
-        Student: { select: { name: true, surname: true, level: true } },
+        Student: {
+          select: {
+            id: true,
+            name: true,
+            surname: true,
+            level: true,
+            username: true,
+          },
+        },
         FeeStructure: { select: { name: true, amount: true } },
+        Session: { select: { name: true, term: true } }, // ← ADD THIS
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: "asc" },
     });
 
-    res.json(fees);
+    // Compute balance due per record
+    const result = fees.map((f) => ({
+      ...f,
+      balanceDue: f.amountCharged - f.amountPaid,
+    }));
+
+    const totalOutstanding = result.reduce((s, f) => s + f.balanceDue, 0);
+
+    res.json({ fees: result, totalOutstanding, count: result.length });
+  }),
+);
+
+// ─── Outstanding Fees Grouped by Session ──────────────────────────────────
+// GET /fees/student-fees/outstanding-summary/:schoolId
+feesRoute.get(
+  "/student-fees/outstanding-summary/:schoolId",
+  expressAsyncHandler(async (req, res) => {
+    const { schoolId } = req.params;
+
+    const fees = await prisma.studentFee.findMany({
+      where: {
+        schoolId,
+        status: { in: ["UNPAID", "PARTIALLY_PAID"] },
+      },
+      include: {
+        Session: { select: { id: true, name: true, term: true } },
+      },
+    });
+
+    // Group by session
+    const grouped = {};
+    for (const fee of fees) {
+      const key = fee.sessionId;
+      if (!grouped[key]) {
+        grouped[key] = {
+          sessionId: fee.sessionId,
+          sessionName: fee.Session?.name,
+          term: fee.Session?.term,
+          totalOutstanding: 0,
+          studentCount: new Set(),
+          feeCount: 0,
+        };
+      }
+      grouped[key].totalOutstanding += fee.amountCharged - fee.amountPaid;
+      grouped[key].studentCount.add(fee.studentId);
+      grouped[key].feeCount++;
+    }
+
+    const summary = Object.values(grouped).map((g) => ({
+      ...g,
+      studentCount: g.studentCount.size, // convert Set → number
+    }));
+
+    res.json(summary);
+  }),
+);
+
+// ─── Get a Student's Outstanding Fees Across All Sessions ─────────────────
+// GET /fees/student-fees/student/:studentId/outstanding
+feesRoute.get(
+  "/student-fees/student/:studentId/outstanding",
+  expressAsyncHandler(async (req, res) => {
+    const { studentId } = req.params;
+
+    const fees = await prisma.studentFee.findMany({
+      where: {
+        studentId,
+        status: { in: ["UNPAID", "PARTIALLY_PAID"] },
+      },
+      include: {
+        FeeStructure: { select: { name: true, amount: true } },
+        Session: { select: { name: true, term: true } },
+        payments: true,
+      },
+      orderBy: { createdAt: "asc" },
+    });
+
+    const result = fees.map((f) => ({
+      ...f,
+      balanceDue: f.amountCharged - f.amountPaid,
+    }));
+
+    const totalOwed = result.reduce((s, f) => s + f.balanceDue, 0);
+
+    res.json({ fees: result, totalOwed });
+  }),
+);
+
+// ─── Carry Forward Outstanding Fees to a New Session ─────────────────────
+// POST /fees/student-fees/carry-forward
+feesRoute.post(
+  "/student-fees/carry-forward",
+  protect,
+  expressAsyncHandler(async (req, res) => {
+    const { fromSessionId, toSessionId, schoolId } = req.body;
+
+    if (!fromSessionId || !toSessionId || !schoolId) {
+      return res
+        .status(400)
+        .json({
+          message: "fromSessionId, toSessionId and schoolId are required.",
+        });
+    }
+
+    // Get all unpaid/partial fees from the old session
+    const outstanding = await prisma.studentFee.findMany({
+      where: {
+        schoolId,
+        sessionId: fromSessionId,
+        status: { in: ["UNPAID", "PARTIALLY_PAID"] },
+      },
+      include: { FeeStructure: true },
+    });
+
+    if (outstanding.length === 0) {
+      return res.status(404).json({
+        message: "No outstanding fees found for the selected session.",
+      });
+    }
+
+    let carried = 0;
+    let skipped = 0;
+
+    for (const fee of outstanding) {
+      const balanceDue = fee.amountCharged - fee.amountPaid;
+      if (balanceDue <= 0) {
+        skipped++;
+        continue;
+      }
+
+      // Check if already carried forward
+      const exists = await prisma.studentFee.findFirst({
+        where: {
+          studentId: fee.studentId,
+          feeStructureId: fee.feeStructureId,
+          sessionId: toSessionId,
+          carriedForwardFrom: fee.id, // track origin
+        },
+      });
+      if (exists) {
+        skipped++;
+        continue;
+      }
+
+      try {
+        await prisma.studentFee.create({
+          data: {
+            studentId: fee.studentId,
+            feeStructureId: fee.feeStructureId,
+            sessionId: toSessionId,
+            schoolId,
+            amountCharged: balanceDue, // only the unpaid balance
+            amountPaid: 0,
+            status: "UNPAID",
+            carriedForwardFrom: fee.id, // ← add this field to your schema
+          },
+        });
+        carried++;
+      } catch (e) {
+        if (e.code === "P2002") {
+          skipped++;
+        } else {
+          throw e;
+        }
+      }
+    }
+
+    res.json({
+      message: `Carry forward complete. Carried: ${carried}, Skipped: ${skipped}.`,
+      carried,
+      skipped,
+    });
   }),
 );
 

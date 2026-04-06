@@ -74,6 +74,7 @@ export const feeStructuresApi = {
 };
 
 // ─── Student Fees ─────────────────────────────────────────────────────────
+// ─── Student Fees ─────────────────────────────────────────────────────────
 export const studentFeesApi = {
   assign: (data: any) => api.post("/fees/student-fees", data),
   bulkAssign: (data: any) => api.post("/fees/student-fees/bulk-assign", data),
@@ -86,6 +87,21 @@ export const studentFeesApi = {
       params: sessionId ? { sessionId } : {},
     }),
   remove: (id: string) => api.delete(`/fees/student-fees/${id}`),
+
+  // 🆕 NEW — Arrears grouped by session/term
+  getOutstandingSummary: (schoolId: string) =>
+    api.get(`/fees/student-fees/outstanding-summary/${schoolId}`),
+
+  // 🆕 NEW — One student's full debt across all sessions
+  getStudentOutstanding: (studentId: string) =>
+    api.get(`/fees/student-fees/student/${studentId}/outstanding`),
+
+  // 🆕 NEW — Roll unpaid fees into next session
+  carryForward: (data: {
+    fromSessionId: string;
+    toSessionId: string;
+    schoolId: string;
+  }) => api.post("/fees/student-fees/carry-forward", data),
 };
 
 // ─── Students ─────────────────────────────────────────────────────────────

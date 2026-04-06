@@ -84,8 +84,12 @@ export default function DashboardPage() {
               : 0,
           outstanding:
             outstanding.status === "fulfilled"
-              ? outstanding.value.data.slice(0, 5)
+              ? outstanding.value.data.fees?.slice(0, 5) || [] // ✅
               : [],
+          outstandingCount:
+            outstanding.status === "fulfilled"
+              ? (outstanding.value.data.count ?? 0) // 🆕
+              : 0,
           recentPayments:
             payments.status === "fulfilled"
               ? payments.value.data.payments?.slice(0, 5) || []
@@ -168,9 +172,10 @@ export default function DashboardPage() {
           icon={<TrendingUp size={18} />}
           sub={netProfit >= 0 ? "Surplus" : "Deficit"}
         />
+
         <StatCard
           label="Outstanding Fees"
-          value={data.outstanding.length}
+          value={data.outstandingCount}
           icon={<AlertCircle size={18} />}
           sub="Students with balance"
         />

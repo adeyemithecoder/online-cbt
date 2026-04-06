@@ -55,6 +55,33 @@ export default function StudentsPage() {
   const [form, setForm] = useState(emptyForm);
   const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
 
+  // Add this state
+  const [studentOutstanding, setStudentOutstanding] = useState<any>({
+    fees: [],
+    totalOwed: 0,
+  });
+
+  // Update openView
+  const openView = async (s: any) => {
+    setSelectedStudent(s);
+    setModal("view");
+    setStudentFees([]);
+    setStudentOutstanding({ fees: [], totalOwed: 0 });
+    setLoadingFees(true);
+    try {
+      const [feesRes, outstandingRes] = await Promise.all([
+        studentFeesApi.getForStudent(s.id, currentSessionId || undefined),
+        studentFeesApi.getStudentOutstanding(s.id), // 🆕
+      ]);
+      setStudentFees(feesRes.data);
+      setStudentOutstanding(outstandingRes.data);
+    } catch {
+      setStudentFees([]);
+    } finally {
+      setLoadingFees(false);
+    }
+  };
+
   const load = async () => {
     if (!schoolId) return;
     setLoading(true);
@@ -71,24 +98,6 @@ export default function StudentsPage() {
   useEffect(() => {
     load();
   }, [schoolId, levelFilter]);
-
-  const openView = async (s: any) => {
-    setSelectedStudent(s);
-    setModal("view");
-    setStudentFees([]);
-    setLoadingFees(true);
-    try {
-      const res = await studentFeesApi.getForStudent(
-        s.id,
-        currentSessionId || undefined,
-      );
-      setStudentFees(res.data);
-    } catch {
-      setStudentFees([]);
-    } finally {
-      setLoadingFees(false);
-    }
-  };
 
   const handleCreate = async () => {
     if (
@@ -579,7 +588,39 @@ export default function StudentsPage() {
                 </div>
               )}
             </div>
-
+            {/* Outstanding across ALL sessions */}
+            {studentOutstanding.fees.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[11px] text-light uppercase tracking-wider m-0">
+                    Outstanding Across All Terms
+                  </p>
+                  <span className="text-[12px] font-semibold text-danger">
+                    {fmt.currency(studentOutstanding.totalOwed)} total
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {studentOutstanding.fees.map((f: any) => (
+                    <div
+                      key={f.id}
+                      className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-danger/30 bg-danger/5 gap-3"
+                    >
+                      <div className="min-w-0">
+                        <p className="m-0 text-[13px] text-white font-medium truncate">
+                          {f.FeeStructure?.name}
+                        </p>
+                        <p className="m-0 text-[11px] text-light">
+                          {f.Session?.name} · {f.Session?.term} Term
+                        </p>
+                      </div>
+                      <span className="text-danger font-semibold text-[13px] shrink-0 whitespace-nowrap">
+                        {fmt.currency(f.balanceDue)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="flex gap-2 sm:gap-3 pt-2">
               <Button
                 variant="secondary"

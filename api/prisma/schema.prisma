@@ -70,17 +70,16 @@ model User {
 }
 
 model Student {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  level    String
-  password String
-  name     String
-  username String   @unique
-  surname  String
-  subjects Json?
-  answers  Answer[]
-  schoolId String   @db.ObjectId
-  School   School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  level       String
+  password    String
+  name        String
+  username    String       @unique
+  surname     String
+  subjects    Json?
+  answers     Answer[]
+  schoolId    String       @db.ObjectId
+  School      School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   // Accounting relations
   studentFees StudentFee[]
   feePayments FeePayment[]
@@ -141,9 +140,7 @@ model AcademicSession {
   startDate DateTime
   endDate   DateTime
   isCurrent Boolean  @default(false)
-
-  // ✅ NEW (VERY IMPORTANT)
-  isLocked Boolean @default(false)
+  isLocked  Boolean  @default(false)
 
   schoolId String @db.ObjectId
   School   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
@@ -360,11 +357,11 @@ model StudentFee {
   feeStructureId String       @db.ObjectId
   FeeStructure   FeeStructure @relation(fields: [feeStructureId], references: [id])
 
-  sessionId String          @db.ObjectId
-  Session   AcademicSession @relation(fields: [sessionId], references: [id])
-
-  schoolId String @db.ObjectId
-  School   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  sessionId          String          @db.ObjectId
+  Session            AcademicSession @relation(fields: [sessionId], references: [id])
+  carriedForwardFrom String?         @db.ObjectId
+  schoolId           String          @db.ObjectId
+  School             School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

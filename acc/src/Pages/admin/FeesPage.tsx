@@ -229,7 +229,10 @@ export default function FeesPage() {
   const [assignStudent, setAssignStudent] = useState<any | null>(null);
   const [assignFeeStructureId, setAssignFeeStructureId] = useState("");
   const [bulkFeeStructureId, setBulkFeeStructureId] = useState("");
-
+  const [outstandingMeta, setOutstandingMeta] = useState({
+    totalOutstanding: 0,
+    count: 0,
+  });
   const revenueAccounts = accounts
     .filter((a) => a.accountType === "REVENUE" && a.isActive)
     .map((a) => ({ value: a.id, label: `${a.code} — ${a.name}` }));
@@ -271,7 +274,12 @@ export default function FeesPage() {
         accountsApi.getAll(schoolId),
       ]);
       setStructures(sRes.data);
-      setOutstanding(oRes.data);
+
+      setOutstanding(oRes.data.fees ?? []);
+      setOutstandingMeta({
+        totalOutstanding: oRes.data.totalOutstanding ?? 0,
+        count: oRes.data.count ?? 0,
+      });
       setAccounts(aRes.data);
     } catch (e) {
       toast.error(getErrorMessage(e));
@@ -282,7 +290,6 @@ export default function FeesPage() {
   useEffect(() => {
     load();
   }, [schoolId, currentSessionId]);
-
   const handleCreateStructure = async () => {
     if (!feeForm.name || !feeForm.amount || !feeForm.revenueAccountId) {
       toast.error("All required fields must be filled.");
@@ -377,11 +384,6 @@ export default function FeesPage() {
         .includes(search.toLowerCase()),
   );
 
-  const totalOutstanding = outstanding.reduce(
-    (s, f) => s + (f.amountCharged - f.amountPaid),
-    0,
-  );
-
   return (
     <div className="p-4 sm:p-6 animate-fade-in">
       <PageHeader
@@ -442,9 +444,8 @@ export default function FeesPage() {
           sub="Students with balance"
         />
         <StatCard
-          className="col-span-2 sm:col-span-1"
           label="Total Outstanding"
-          value={fmt.currency(totalOutstanding)}
+          value={fmt.currency(outstandingMeta.totalOutstanding)}
           icon={<AlertCircle size={18} />}
           accent
         />
@@ -575,6 +576,8 @@ export default function FeesPage() {
                     <Th>Student</Th>
                     <Th className="hidden sm:table-cell">Level</Th>
                     <Th className="hidden md:table-cell">Fee</Th>
+                    <Th className="hidden md:table-cell">Term</Th>
+
                     <Th className="hidden lg:table-cell">Charged</Th>
                     <Th className="hidden lg:table-cell">Paid</Th>
                     <Th>Balance</Th>
@@ -599,6 +602,9 @@ export default function FeesPage() {
                         </Td>
                         <Td className="text-light hidden md:table-cell">
                           {f.FeeStructure?.name}
+                        </Td>
+                        <Td className="text-light hidden md:table-cell">
+                          {f.Session?.name} · {f.Session?.term}
                         </Td>
                         <Td className="font-medium hidden lg:table-cell whitespace-nowrap">
                           {fmt.currency(f.amountCharged)}
