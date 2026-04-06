@@ -24,10 +24,10 @@ const QuestionComponent = ({
   const [loading, setLoading] = useState(false);
 
   const [answers, setAnswers] = useState(
-    exam && Array(exam.questions?.length).fill("")
+    exam && Array(exam.questions?.length).fill(""),
   );
   const schoolId = JSON.parse(
-    localStorage.getItem("loggedInStudent")
+    localStorage.getItem("loggedInStudent"),
   )?.schoolId;
   const navigate = useNavigate();
 
@@ -46,7 +46,7 @@ const QuestionComponent = ({
     try {
       await axios.post(
         `${apiUrl}/api/students/create-answer`,
-        studentQuestionsAndAnswers
+        studentQuestionsAndAnswers,
       );
     } catch (error) {
       console.error(getError(error));
@@ -59,14 +59,13 @@ const QuestionComponent = ({
     updateStudentScore(score, loggedInStudent.id);
 
     setAlertMessage(
-      `Your score is ${score}/${exam.questions?.length}. You are good to go.`
+      `Your score is ${score}/${exam.questions?.length}. You are good to go.`,
     );
     setOpenAlert(true);
 
     setPostSubmitNavigation(true);
     setLoading(false);
   }, [answers, loggedInStudent, exam, schoolId, updateStudentScore]);
-  console.log(openAlert);
   useEffect(() => {
     if (!openAlert && postSubmitNavigation) {
       localStorage.removeItem("loggedInStudent");
@@ -137,7 +136,7 @@ const QuestionComponent = ({
         </span>
       ) : (
         part
-      )
+      ),
     );
   };
 
@@ -226,8 +225,8 @@ const QuestionComponent = ({
                 index === currentQuestionIndex
                   ? "exam-number active"
                   : answers[index]
-                  ? "exam-number answered"
-                  : "exam-number"
+                    ? "exam-number answered"
+                    : "exam-number"
               }
               onClick={() => setCurrentQuestionIndex(index)}
             >

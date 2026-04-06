@@ -213,7 +213,6 @@ reportsRoute.get(
     //   "liabilitiesPlusEquityPlusProfit=",
     //   liabilitiesPlusEquityPlusProfit,
     // );
-    // console.log("isBalanced=", isBalanced);
 
     res.json({
       assets,

@@ -80,7 +80,6 @@ export default function AccountsPage() {
       setLoading(false);
     }
   };
-  console.log(accounts);
   useEffect(() => {
     load();
   }, [schoolId]);

@@ -19,7 +19,7 @@ const EditQuestion = () => {
     const fetchQuestion = async () => {
       try {
         const { data } = await axios.get(
-          `${apiUrl}/api/exams/question/${questionId}`
+          `${apiUrl}/api/exams/question/${questionId}`,
         );
         setQuestion(data);
       } catch (error) {
@@ -75,8 +75,6 @@ const EditQuestion = () => {
   const correctAnswerLetter =
     optionToLetterMap(question.options)[question.correctAnswer] || "";
 
-  console.log(question);
-
   const handleUpdateQuestion = async (e) => {
     e.preventDefault();
     const trimmedQuestion = {
@@ -89,7 +87,7 @@ const EditQuestion = () => {
     try {
       await axios.put(
         `${apiUrl}/api/exams/question/${questionId}`,
-        trimmedQuestion
+        trimmedQuestion,
       );
       setAlertMessage("Question updated successfully");
       setOpenAlert(true);

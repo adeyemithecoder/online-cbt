@@ -228,7 +228,6 @@ export default function PaymentsPage() {
     const total = payments.reduce((s, p) => s + p.amountPaid, 0);
     setTotalCollected(total);
   }, [payments]);
-  console.log(payments);
   // When a student is selected from the search, auto-load their unpaid fees
   const handleStudentSelect = async (student: any) => {
     setSelectedStudent(student);
