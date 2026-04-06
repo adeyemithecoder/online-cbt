@@ -165,6 +165,13 @@ export const donationsApi = {
     }),
 };
 
+export const otherTransactionsApi = {
+  create: (data: any) => api.post("/other-transactions", data),
+  getAll: (schoolId: string, sessionId?: string) =>
+    api.get(`/other-transactions/school/${schoolId}`, {
+      params: sessionId ? { sessionId } : {},
+    }),
+};
 // ─── Audit ────────────────────────────────────────────────────────────────
 export const auditApi = {
   getByEntity: (entity: string, entityId: string) =>
@@ -191,6 +198,17 @@ export const reportsApi = {
     api.get(`/reports/income-statement/${schoolId}`, {
       params: { sessionId },
     }),
+};
+
+export const superAdminApi = {
+  getSchools: () => api.get("/super-admin/schools"),
+  getSchool: (id: string) => api.get(`/super-admin/schools/${id}`),
+  createSchool: (data: any) => api.post("/super-admin/schools", data),
+  updateSchool: (id: string, data: any) =>
+    api.put(`/super-admin/schools/${id}`, data),
+  deleteSchool: (id: string) => api.delete(`/super-admin/schools/${id}`),
+  createAdmin: (schoolId: string, data: any) =>
+    api.post(`/super-admin/schools/${schoolId}/admins`, data),
 };
 
 export default api;

@@ -24,6 +24,7 @@ import { fmt, getErrorMessage } from "../../utils/helpers";
 export default function DonationsPage() {
   const { accountingAuth } = useApp();
   const { schoolId, userId, currentSessionId } = accountingAuth;
+
   const toast = useToast();
   const [donations, setDonations] = useState<any[]>([]);
   const [totalDonated, setTotalDonated] = useState(0);

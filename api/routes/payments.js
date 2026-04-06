@@ -67,7 +67,7 @@ paymentRoute.post(
     }
 
     const remaining = studentFee.amountCharged - studentFee.amountPaid;
-    if (amountPaid > remaining) {
+    if (amountPaid > remaining + 0.01) {
       return res.status(400).json({
         message: `Overpayment detected. Remaining balance: ${remaining}`,
       });

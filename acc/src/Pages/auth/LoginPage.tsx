@@ -18,20 +18,23 @@ export default function LoginPage() {
     import.meta.env.MODE == "development"
       ? "http://localhost:5000/api/users"
       : "https://cbt-api-rho.vercel.app/api/users";
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
       const res = await axios.post(`${apiUrl}/login-user`, form);
-      const { user, token, currentSessionId } = res.data;
+      const role = res.data.role;
       setAccountingAuth({
-        userId: user.id,
-        schoolId: user.schoolId,
-        token,
-        currentSessionId,
+        userId: res.data.userId,
+        schoolId: res.data.schoolId,
+        token: res.data.token,
+        currentSessionId: res.data.currentSessionId,
+        role,
+        classes: res.data.classes || [],
       });
-      navigate("/");
+      navigate(role === "SUPER_ADMIN" ? "/super-admin" : "/");
     } catch (err: any) {
       setError(
         err.response?.data?.message || "Login failed. Please try again.",

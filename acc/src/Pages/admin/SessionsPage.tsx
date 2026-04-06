@@ -21,7 +21,7 @@ import {
 import { fmt, TERM_TYPES, getErrorMessage } from "../../utils/helpers";
 
 const SESSION_OPTIONS = Array.from({ length: 6 }, (_, i) => {
-  const start = 2026 + i;
+  const start = 2025 + i;
   const end = start + 1;
 
   return {

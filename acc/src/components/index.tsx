@@ -533,7 +533,7 @@ const badgeVariant: Record<string, string> = {
 
   info: "bg-primary-variant text-white border border-primary-variant",
 
-  neutral: "bg-bg-deep text-light border border-bg-deep",
+  neutral: "bg-primary text-black border border-primary-variant",
 };
 
 export function Badge({

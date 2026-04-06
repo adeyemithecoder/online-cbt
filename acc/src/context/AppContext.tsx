@@ -5,6 +5,8 @@ interface AccountingAuth {
   schoolId: string;
   token: string;
   currentSessionId: string;
+  role: string;
+  classes: string[];
 }
 
 interface AppContextType {
@@ -13,8 +15,17 @@ interface AppContextType {
   clearAccountingAuth: () => void;
 }
 
+const defaultAuth: AccountingAuth = {
+  userId: "",
+  schoolId: "",
+  token: "",
+  currentSessionId: "",
+  role: "",
+  classes: [],
+};
+
 const AppContext = createContext<AppContextType>({
-  accountingAuth: { userId: "", schoolId: "", token: "", currentSessionId: "" },
+  accountingAuth: defaultAuth,
   setAccountingAuth: () => {},
   clearAccountingAuth: () => {},
 });
@@ -23,9 +34,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [accountingAuth, setAccountingAuthState] = useState<AccountingAuth>(
     () => {
       const stored = localStorage.getItem("accountingAuth");
-      return stored
-        ? JSON.parse(stored)
-        : { userId: "", schoolId: "", token: "", currentSessionId: "" };
+      return stored ? JSON.parse(stored) : defaultAuth;
     },
   );
 
@@ -35,12 +44,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const clearAccountingAuth = () => {
-    setAccountingAuthState({
-      userId: "",
-      schoolId: "",
-      token: "",
-      currentSessionId: "",
-    });
+    setAccountingAuthState(defaultAuth);
     localStorage.removeItem("accountingAuth");
   };
 

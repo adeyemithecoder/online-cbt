@@ -31,16 +31,15 @@ const emptyForm = {
   level: "",
 };
 
-const LEVEL_OPTIONS = ["js1", "js2", "js3", "ss1", "ss2", "ss3"].map((l) => ({
-  value: l,
-  label: l.toUpperCase(),
-}));
-
 export default function StudentsPage() {
   const { accountingAuth } = useApp();
-  const { schoolId, currentSessionId } = accountingAuth;
+  const { schoolId, currentSessionId, classes } = accountingAuth;
   const toast = useToast();
 
+  const LEVEL_OPTIONS = classes.map((c) => ({
+    value: c,
+    label: c.toUpperCase(),
+  }));
   const [students, setStudents] = useState<any[]>([]);
   const [studentFees, setStudentFees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

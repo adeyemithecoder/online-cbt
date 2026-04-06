@@ -121,48 +121,44 @@ userRoute.post(
   expressAsyncHandler(async (req, res) => {
     const { username, password } = req.body;
 
-    try {
-      const user = await prisma.user.findUnique({ where: { username } });
-
-      if (!user) {
-        return res.status(404).json({ message: "Username not found" });
-      }
-
-      if (user.password !== password) {
-        return res.status(401).json({ message: "Wrong password" });
-      }
-
-      // ✅ GENERATE TOKEN
-      const token = jwt.sign(
-        {
-          id: user.id,
-          role: user.role,
-          schoolId: user.schoolId,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "7d" },
-      );
-
-      // ✅ FETCH CURRENT SESSION FOR THIS SCHOOL
-      const currentSession = await prisma.academicSession.findFirst({
-        where: { schoolId: user.schoolId, isCurrent: true },
-      });
-
-      const currentSessionId = currentSession?.id || null;
-
-      // ✅ RETURN USER + TOKEN + CURRENT SESSION
-      res.status(200).json({
-        message: "Login successful",
-        token,
-        user,
-        currentSessionId, // <-- send this along
-      });
-    } catch (err) {
-      res
-        .status(500)
-        .json({ message: "An error occurred", error: err.message });
+    const user = await prisma.user.findUnique({ where: { username } });
+    if (!user) {
+      return res.status(404).json({ message: "Username not found" });
     }
+
+    if (user.password !== password) {
+      return res.status(401).json({ message: "Wrong password" });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, role: user.role, schoolId: user.schoolId },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" },
+    );
+
+    let currentSessionId = null;
+    let classes = [];
+
+    if (user.schoolId) {
+      const [currentSession, school] = await Promise.all([
+        prisma.academicSession.findFirst({
+          where: { schoolId: user.schoolId, isCurrent: true },
+        }),
+        prisma.school.findUnique({ where: { id: user.schoolId } }),
+      ]);
+      currentSessionId = currentSession?.id || null;
+      classes = school?.classes || [];
+    }
+
+    res.status(200).json({
+      message: "Login successful",
+      currentSessionId,
+      token,
+      userId: user.id,
+      schoolId: user.schoolId || null,
+      role: user.role,
+      classes,
+    });
   }),
 );
-
 export { userRoute };

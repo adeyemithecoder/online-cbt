@@ -1,12 +1,15 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useApp } from "../../context/AppContext";
 import Sidebar from "./Sidebar";
+import SuperAdminLayout from "./SuperAdminLayout";
 
 export default function Layout() {
   const { accountingAuth } = useApp();
-  const { userId } = accountingAuth;
+  const { userId, role } = accountingAuth;
 
   if (!userId) return <Navigate to="/login" replace />;
+
+  if (role === "SUPER_ADMIN") return <SuperAdminLayout />;
 
   return (
     <div className="flex min-h-screen">

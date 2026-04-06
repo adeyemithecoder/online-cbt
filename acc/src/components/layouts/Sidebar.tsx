@@ -18,6 +18,7 @@ import {
   LogOut,
   Menu,
   X,
+  Receipt,
 } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { ConfirmDialog } from "..";
@@ -51,6 +52,7 @@ const navGroups = [
     items: [
       { to: "/loans", icon: Landmark, label: "Loans" },
       { to: "/donations", icon: Gift, label: "Donations" },
+      { to: "/other-transactions", icon: Receipt, label: "Other Transactions" },
     ],
   },
   {

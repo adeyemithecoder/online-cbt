@@ -19,6 +19,8 @@ import { ToastProvider } from "./context/ToastContext";
 import StudentsPage from "./Pages/admin/StudentsPage";
 import Layout from "./components/layouts/Layout";
 import DashboardPage from "./Pages/admin/DashboardPage";
+import SuperAdminPage from "./Pages/superadmin/SuperAdminPage";
+import OtherTransactionsPage from "./Pages/admin/OtherTransactionsPage";
 
 export default function App() {
   return (
@@ -40,8 +42,13 @@ export default function App() {
             <Route path="/expenses" element={<ExpensesPage />} />
             <Route path="/loans" element={<LoansPage />} />
             <Route path="/donations" element={<DonationsPage />} />
+            <Route
+              path="/other-transactions"
+              element={<OtherTransactionsPage />}
+            />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/audit" element={<AuditPage />} />
+            <Route path="/super-admin" element={<SuperAdminPage />} />
           </Route>
         </Routes>
       </ToastProvider>

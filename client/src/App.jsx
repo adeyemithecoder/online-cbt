@@ -36,7 +36,7 @@ function App() {
     setIsAdmin(storedObject.role); // Ensure this is placed correctly; consider moving it to a `useEffect`.
     return children;
   };
-  console.log(isAdmin);
+
   return (
     <Router>
       {isAdmin === "ADMIN" && <Navbar />}

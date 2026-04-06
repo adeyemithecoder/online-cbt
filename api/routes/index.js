@@ -23,7 +23,11 @@ import expenseRoute from "./expenses.js";
 import loanDonationRoute from "./loans-donations.js";
 import auditRoute from "./audit.js";
 import reportsRoute from "./reports.js";
+import superAdminRoute from "./superadmin.js";
+import otherTransactionsRoute from "./other-transactions.js";
 
+accountingRouter.use("/other-transactions", otherTransactionsRoute);
+accountingRouter.use("/super-admin", superAdminRoute);
 accountingRouter.use("/sessions", sessionRoute);
 accountingRouter.use("/accounts", accountRoute);
 accountingRouter.use("/journal", journalRoute);

@@ -38,6 +38,44 @@ const emptyForm = {
   normalBalance: "",
 };
 
+const ACCOUNT_SUGGESTIONS: Record<string, string[]> = {
+  ASSET: [
+    "Cash on Hand",
+    "Bank Account",
+    "Petty Cash",
+    "School Equipment",
+    "Land & Buildings",
+    "Other Assets",
+  ],
+  LIABILITY: [
+    "Loans Payable",
+    "Accounts Payable",
+    "Salaries Payable",
+    "Tax Payable",
+    "Other Liabilities",
+  ],
+  EQUITY: ["Retained Earnings", "Owner's Capital", "School Reserve Fund"],
+  REVENUE: [
+    "Tuition Fees",
+    "Admission Fees",
+    "Examination Fees",
+    "Transport Fees",
+    "Donation Income",
+    "Sport Fees",
+    "Miscellaneous Income",
+  ],
+  EXPENSE: [
+    "Salaries Expense",
+    "Maintenance Expense",
+    "Utilities Expense",
+    "Transport Expense",
+    "Stationery Expense",
+    "Examination Expense",
+    "Security Expense",
+    "Miscellaneous Expense",
+  ],
+};
+
 export default function AccountsPage() {
   const { accountingAuth } = useApp();
   const { schoolId } = accountingAuth;
@@ -306,13 +344,33 @@ export default function AccountsPage() {
             />
           </div>
 
-          <Input
-            label="Account Name"
-            placeholder="e.g. Cash on Hand"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            required
-          />
+          <div className="flex flex-col gap-1.5">
+            <Input
+              label="Account Name"
+              placeholder="e.g. Cash on Hand"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              required
+            />
+            {form.accountType && ACCOUNT_SUGGESTIONS[form.accountType] && (
+              <div className="flex flex-wrap gap-1.5">
+                {ACCOUNT_SUGGESTIONS[form.accountType].map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    onClick={() => setForm({ ...form, name: suggestion })}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all cursor-pointer ${
+                      form.name === suggestion
+                        ? "bg-primary-variant border-primary-variant text-white"
+                        : "bg-bg border-bg-deep text-light hover:text-white hover:border-primary-variant"
+                    }`}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           <Select
             label="Normal Balance"
