@@ -2,7 +2,7 @@
 
 export const apiUrl =
   import.meta.env.MODE == "development"
-    ? "http://localhost:4000"
+    ? "http://localhost:5000"
     : "https://cbt-api-rho.vercel.app";
 
 export const getError = (error) => {

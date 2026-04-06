@@ -31,7 +31,8 @@ const Login = () => {
         password: values.password,
       });
       setError("");
-      localStorage.setItem("loggedInStudent", JSON.stringify(data));
+      console.log(data);
+      localStorage.setItem("loggedInStudent", JSON.stringify(data.user));
       navigate("/exam");
     } catch (error) {
       console.error("Error fetching students:", error);
