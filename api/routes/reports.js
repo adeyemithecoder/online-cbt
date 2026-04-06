@@ -203,17 +203,17 @@ reportsRoute.get(
     const isBalanced =
       Math.abs(assets.total - liabilitiesPlusEquityPlusProfit) < 0.01;
 
-    console.log("assets=", assets);
-    console.log("liabilities=", liabilities);
-    console.log("equity=", equity);
-    console.log("revenue=", revenue);
-    console.log("expenses=", expenses);
-    console.log("netProfit=", netProfit);
-    console.log(
-      "liabilitiesPlusEquityPlusProfit=",
-      liabilitiesPlusEquityPlusProfit,
-    );
-    console.log("isBalanced=", isBalanced);
+    // console.log("assets=", assets);
+    // console.log("liabilities=", liabilities);
+    // console.log("equity=", equity);
+    // console.log("revenue=", revenue);
+    // console.log("expenses=", expenses);
+    // console.log("netProfit=", netProfit);
+    // console.log(
+    //   "liabilitiesPlusEquityPlusProfit=",
+    //   liabilitiesPlusEquityPlusProfit,
+    // );
+    // console.log("isBalanced=", isBalanced);
 
     res.json({
       assets,
