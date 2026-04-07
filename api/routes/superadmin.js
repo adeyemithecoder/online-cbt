@@ -126,8 +126,8 @@ superAdminRoute.delete(
     await prisma.exam.deleteMany({ where: { schoolId: id } });
     await prisma.subject.deleteMany({ where: { schoolId: id } });
     await prisma.student.deleteMany({ where: { schoolId: id } });
-    // await prisma.user.deleteMany({ where: { schoolId: id } });
-    // await prisma.school.delete({ where: { id } });
+    await prisma.user.deleteMany({ where: { schoolId: id } });
+    await prisma.school.delete({ where: { id } });
 
     res.json({ message: "School and all related data deleted successfully." });
   }),
