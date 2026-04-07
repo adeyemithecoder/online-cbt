@@ -153,13 +153,10 @@ superAdminRoute.post(
       return res.status(409).json({ message: "Username already taken." });
     }
 
-    const bcrypt = await import("bcryptjs");
-    const hashed = await bcrypt.default.hash(password, 10);
-
     const user = await prisma.user.create({
       data: {
         username,
-        password: hashed,
+        password, // ⚠️ stored as plain text
         name,
         role: role || "ADMIN",
         schoolId: id,
