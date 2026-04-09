@@ -8,7 +8,11 @@ import {
   Trash2,
   ArrowRightCircle,
 } from "lucide-react";
-import { useApp } from "../../context/AppContext";
+import {
+  defaultAuth,
+  useApp,
+  type AccountingAuth,
+} from "../../context/AppContext";
 import { studentsApi, studentFeesApi } from "../../api/client";
 import { useToast } from "../../context/ToastContext";
 import {
@@ -40,12 +44,21 @@ const emptyForm = {
 };
 
 export default function StudentsPage() {
-  const { accountingAuth } = useApp();
+  // const { accountingAuth } = useApp();
+  const [accountingAuth] = useState<AccountingAuth>(() => {
+    const stored = localStorage.getItem("accountingAuth");
+    if (!stored) return defaultAuth;
+    const parsed = JSON.parse(stored);
+    return {
+      ...defaultAuth, // ensures any new fields like sessions are never undefined
+      ...parsed,
+    };
+  });
   const { schoolId, currentSessionId, classes } = accountingAuth;
 
   const SESSION_OPTIONS = Array.from(
     new Map(
-      accountingAuth.sessions.map((s) => [
+      (accountingAuth.sessions ?? []).map((s) => [
         s.name,
         { value: s.name, label: s.name },
       ]),

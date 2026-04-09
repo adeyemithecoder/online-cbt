@@ -7,7 +7,7 @@ interface Session {
   isCurrent: boolean;
 }
 
-interface AccountingAuth {
+export interface AccountingAuth {
   userId: string;
   schoolId: string;
   token: string;
@@ -23,7 +23,7 @@ interface AppContextType {
   clearAccountingAuth: () => void;
 }
 
-const defaultAuth: AccountingAuth = {
+export const defaultAuth: AccountingAuth = {
   userId: "",
   schoolId: "",
   token: "",
