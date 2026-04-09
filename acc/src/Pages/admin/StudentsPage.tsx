@@ -8,11 +8,7 @@ import {
   Trash2,
   ArrowRightCircle,
 } from "lucide-react";
-import {
-  defaultAuth,
-  useApp,
-  type AccountingAuth,
-} from "../../context/AppContext";
+import { defaultAuth, type AccountingAuth } from "../../context/AppContext";
 import { studentsApi, studentFeesApi } from "../../api/client";
 import { useToast } from "../../context/ToastContext";
 import {
