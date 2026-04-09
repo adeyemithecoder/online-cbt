@@ -168,78 +168,93 @@ journalRoute.put(
 
 // ─── Reverse a Posted Journal Entry ───────────────────────────────────────
 // Creates a new entry with all debits/credits flipped
+
 journalRoute.post(
   "/:id/reverse",
   protect,
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { createdById, reason } = req.body;
+    const { reason } = req.body;
+    const createdById = req.user.id;
 
+    // ✅ Do this OUTSIDE transaction
     const original = await prisma.journalEntry.findUnique({
       where: { id },
       include: { lines: true },
     });
-    if (!original)
-      return res.status(404).json({ message: "Journal entry not found." });
+
+    if (!original) throw new Error("Journal entry not found.");
+
     if (original.status !== "POSTED") {
-      return res
-        .status(400)
-        .json({ message: "Only POSTED entries can be reversed." });
+      throw new Error(
+        original.status === "REVERSED"
+          ? "Already reversed."
+          : "Only POSTED entries can be reversed.",
+      );
+    }
+
+    if (original.reversalOfId) {
+      throw new Error("Cannot reverse a reversal.");
     }
 
     await assertSessionNotLocked(original.sessionId);
 
+    // ✅ Also outside (can be slow)
     const entryNumber = await generateEntryNumber(original.schoolId);
 
-    // Flip all entry types: DEBIT → CREDIT, CREDIT → DEBIT
-    const reversalEntry = await prisma.journalEntry.create({
-      data: {
-        entryNumber,
-        date: new Date(),
-        description: `REVERSAL: ${original.description}${reason ? ` — ${reason}` : ""}`,
-        source: "MANUAL",
-        status: "POSTED",
-        postedAt: new Date(),
-        reversalOfId: original.id,
-        sessionId: original.sessionId,
-        schoolId: original.schoolId,
-        createdById,
-        lines: {
-          create: original.lines.map((l) => ({
-            accountId: l.accountId,
-            entryType: l.entryType === "DEBIT" ? "CREDIT" : "DEBIT",
-            amount: l.amount,
-            narration: `Reversal of: ${l.narration || ""}`,
-          })),
-        },
-      },
-      include: { lines: true },
-    });
-
-    // Mark original as REVERSED
-    await prisma.journalEntry.update({
-      where: { id },
-      data: { status: "REVERSED" },
-    });
-
-    // ─── If this was a FEE_PAYMENT, reset the student fee record ──────────
+    let feePayment = null;
     if (original.source === "FEE_PAYMENT") {
-      // Find the fee payment linked to this journal entry
-      const feePayment = await prisma.feePayment.findFirst({
+      feePayment = await prisma.feePayment.findFirst({
         where: { journalEntryId: original.id },
         include: { StudentFee: true },
       });
 
-      if (feePayment) {
+      if (!feePayment || feePayment.journalEntryId === null) {
+        throw new Error("Already reversed.");
+      }
+    }
+
+    // ⚡ ONLY critical writes inside transaction
+    const result = await prisma.$transaction(async (tx) => {
+      const reversalEntry = await tx.journalEntry.create({
+        data: {
+          entryNumber,
+          date: new Date(),
+          description: `REVERSAL: ${original.description}${
+            reason ? ` — ${reason}` : ""
+          }`,
+          source: original.source,
+          status: "POSTED",
+          postedAt: new Date(),
+          reversalOfId: original.id,
+          sessionId: original.sessionId,
+          schoolId: original.schoolId,
+          createdById,
+          lines: {
+            create: original.lines.map((l) => ({
+              accountId: l.accountId,
+              entryType: l.entryType === "DEBIT" ? "CREDIT" : "DEBIT",
+              amount: l.amount,
+              narration: `Reversal of: ${l.narration || ""}`,
+            })),
+          },
+        },
+        include: { lines: true },
+      });
+
+      await tx.journalEntry.update({
+        where: { id },
+        data: { status: "REVERSED" },
+      });
+
+      if (original.source === "FEE_PAYMENT" && feePayment) {
         const studentFee = feePayment.StudentFee;
 
-        // Subtract the reversed amount from amountPaid
         const newAmountPaid = Math.max(
           0,
           studentFee.amountPaid - feePayment.amountPaid,
         );
 
-        // Recalculate status
         const newStatus =
           newAmountPaid <= 0
             ? "UNPAID"
@@ -247,48 +262,55 @@ journalRoute.post(
               ? "PAID"
               : "PARTIALLY_PAID";
 
-        await prisma.studentFee.update({
+        await tx.studentFee.update({
           where: { id: studentFee.id },
-          data: { amountPaid: newAmountPaid, status: newStatus },
+          data: {
+            amountPaid: newAmountPaid,
+            status: newStatus,
+          },
         });
 
-        // Mark the fee payment itself as reversed by nulling the journalEntryId
-        await prisma.feePayment.update({
+        await tx.feePayment.update({
           where: { id: feePayment.id },
           data: { journalEntryId: null },
         });
       }
-    }
 
-    // ─── If this was an EXPENSE, reset the expense status back to PENDING ─
-    if (original.source === "EXPENSE") {
-      const expense = await prisma.expense.findFirst({
-        where: { journalEntryId: original.id },
-      });
-
-      if (expense) {
-        await prisma.expense.update({
-          where: { id: expense.id },
-          data: {
-            status: "PENDING",
-            approvedById: null,
-            approvedAt: null,
-            journalEntryId: null,
-          },
+      if (original.source === "EXPENSE") {
+        const expense = await tx.expense.findFirst({
+          where: { journalEntryId: original.id },
         });
-      }
-    }
 
+        if (expense) {
+          await tx.expense.update({
+            where: { id: expense.id },
+            data: {
+              status: "PENDING",
+              approvedById: null,
+              approvedAt: null,
+              journalEntryId: null,
+            },
+          });
+        }
+      }
+
+      return reversalEntry;
+    });
+
+    // ✅ OUTSIDE transaction (important)
     await createAuditLog({
       action: "REVERSE",
       entity: "JournalEntry",
       entityId: id,
       userId: createdById,
       schoolId: original.schoolId,
-      newData: { reversedBy: reversalEntry.id },
+      newData: { reversedBy: result.id },
     });
 
-    res.status(201).json({ message: "Entry reversed.", reversalEntry });
+    res.status(201).json({
+      message: "Entry reversed successfully.",
+      reversalEntry: result,
+    });
   }),
 );
 
@@ -462,4 +484,5 @@ journalRoute.get(
     });
   }),
 );
+
 export default journalRoute;

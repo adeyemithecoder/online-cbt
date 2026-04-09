@@ -686,42 +686,20 @@ feesRoute.post(
   "/students/promote",
   protect,
   expressAsyncHandler(async (req, res) => {
-    const { schoolId, fromLevel, toLevel, fromYear, toYear } = req.body;
+    const { schoolId, fromLevel, toLevel } = req.body;
 
-    if (!schoolId || !fromLevel || !toLevel || !fromYear || !toYear) {
+    if (!schoolId || !fromLevel || !toLevel) {
       return res.status(400).json({
-        message:
-          "schoolId, fromLevel, toLevel, fromYear and toYear are required.",
+        message: "schoolId, fromLevel and toLevel are required.",
       });
     }
 
-    // Resolve ALL session IDs for each academic year
-    const [fromSessions, toSessions] = await Promise.all([
-      prisma.academicSession.findMany({
-        where: { schoolId, name: fromYear },
-        select: { id: true },
-      }),
-      prisma.academicSession.findMany({
-        where: { schoolId, name: toYear },
-        select: { id: true },
-      }),
-    ]);
-
-    if (fromSessions.length === 0 || toSessions.length === 0) {
-      return res.status(404).json({
-        message: "Could not find sessions for the selected academic year(s).",
+    if (fromLevel === toLevel) {
+      return res.status(400).json({
+        message: "fromLevel and toLevel must be different.",
       });
     }
 
-    const fromSessionIds = fromSessions.map((s) => s.id);
-    // Use the isCurrent session of toYear if available, otherwise first one
-    const toSession = await prisma.academicSession.findFirst({
-      where: { schoolId, name: toYear },
-      orderBy: { isCurrent: "desc" },
-    });
-    const toSessionId = toSession.id;
-
-    // 1. Find all students in the current level
     const students = await prisma.student.findMany({
       where: { schoolId, level: fromLevel },
     });
@@ -733,11 +711,8 @@ feesRoute.post(
     }
 
     let promoted = 0;
-    let feesCarried = 0;
-    let feesSkipped = 0;
 
     for (const student of students) {
-      // 2. Update student's level
       await prisma.student.update({
         where: { id: student.id },
         data: { level: toLevel },
@@ -753,68 +728,11 @@ feesRoute.post(
         oldData: { level: fromLevel },
         newData: { level: toLevel },
       });
-
-      // 3. Find outstanding fees across ALL terms of the from year
-      const outstandingFees = await prisma.studentFee.findMany({
-        where: {
-          studentId: student.id,
-          schoolId,
-          sessionId: { in: fromSessionIds }, // all terms of that year
-          status: { in: ["UNPAID", "PARTIALLY_PAID"] },
-        },
-      });
-
-      // 4. Carry forward each outstanding fee to the new session
-      for (const fee of outstandingFees) {
-        const balanceDue = fee.amountCharged - fee.amountPaid;
-        if (balanceDue <= 0) {
-          feesSkipped++;
-          continue;
-        }
-
-        const alreadyCarried = await prisma.studentFee.findFirst({
-          where: {
-            studentId: student.id,
-            feeStructureId: fee.feeStructureId,
-            sessionId: toSessionId,
-            carriedForwardFrom: fee.id,
-          },
-        });
-
-        if (alreadyCarried) {
-          feesSkipped++;
-          continue;
-        }
-
-        try {
-          await prisma.studentFee.create({
-            data: {
-              studentId: student.id,
-              feeStructureId: fee.feeStructureId,
-              sessionId: toSessionId,
-              schoolId,
-              amountCharged: balanceDue,
-              amountPaid: 0,
-              status: "UNPAID",
-              carriedForwardFrom: fee.id,
-            },
-          });
-          feesCarried++;
-        } catch (e) {
-          if (e.code === "P2002") {
-            feesSkipped++;
-          } else {
-            throw e;
-          }
-        }
-      }
     }
 
     res.json({
-      message: `Promotion complete.`,
+      message: `Promotion complete. ${promoted} student(s) moved from ${fromLevel} to ${toLevel}.`,
       promoted,
-      feesCarried,
-      feesSkipped,
     });
   }),
 );

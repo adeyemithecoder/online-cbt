@@ -243,7 +243,11 @@ reportsRoute.get(
       include: {
         journalLines: {
           where: {
-            JournalEntry: { status: "POSTED", sessionId, schoolId },
+            JournalEntry: {
+              sessionId,
+              schoolId,
+              // ✅ removed status filter to include both original + reversal
+            },
           },
         },
       },
@@ -256,11 +260,11 @@ reportsRoute.get(
           const totalDebit = a.journalLines
             .filter((l) => l.entryType === "DEBIT")
             .reduce((s, l) => s + l.amount, 0);
+
           const totalCredit = a.journalLines
             .filter((l) => l.entryType === "CREDIT")
             .reduce((s, l) => s + l.amount, 0);
 
-          // Revenue normal balance is CREDIT, Expense is DEBIT
           const balance =
             a.normalBalance === "CREDIT"
               ? totalCredit - totalDebit
@@ -271,6 +275,7 @@ reportsRoute.get(
         .filter((a) => a.balance !== 0);
 
       const total = section.reduce((s, a) => s + a.balance, 0);
+
       return { items: section, total };
     };
 
@@ -278,6 +283,8 @@ reportsRoute.get(
     const expenses = buildSection("EXPENSE");
 
     const netProfit = revenue.total - expenses.total;
+
+    console.log(revenue);
 
     res.json({
       revenue,

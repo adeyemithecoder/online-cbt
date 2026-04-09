@@ -181,10 +181,16 @@ paymentRoute.get(
     const { sessionId } = req.query;
 
     const payments = await prisma.feePayment.findMany({
-      where: { schoolId, ...(sessionId ? { sessionId } : {}) },
+      where: {
+        schoolId,
+        journalEntryId: { not: null }, // ✅ filter at DB level
+        ...(sessionId ? { sessionId } : {}),
+      },
       include: {
         Student: { select: { name: true, surname: true, level: true } },
-        StudentFee: { include: { FeeStructure: { select: { name: true } } } },
+        StudentFee: {
+          include: { FeeStructure: { select: { name: true } } },
+        },
         RecordedBy: { select: { name: true } },
         CashAccount: { select: { name: true, code: true } },
       },
@@ -204,9 +210,15 @@ paymentRoute.get(
     const { sessionId } = req.query;
 
     const payments = await prisma.feePayment.findMany({
-      where: { studentId, ...(sessionId ? { sessionId } : {}) },
+      where: {
+        studentId,
+        journalEntryId: { not: null }, // ✅
+        ...(sessionId ? { sessionId } : {}),
+      },
       include: {
-        StudentFee: { include: { FeeStructure: { select: { name: true } } } },
+        StudentFee: {
+          include: { FeeStructure: { select: { name: true } } },
+        },
         CashAccount: { select: { name: true } },
       },
       orderBy: { paymentDate: "desc" },
@@ -224,7 +236,10 @@ paymentRoute.get(
     const { sessionId } = req.params;
 
     const payments = await prisma.feePayment.findMany({
-      where: { sessionId },
+      where: {
+        sessionId,
+        journalEntryId: { not: null }, // ✅
+      },
       include: {
         Student: { select: { name: true, surname: true } },
         CashAccount: { select: { name: true, code: true } },
