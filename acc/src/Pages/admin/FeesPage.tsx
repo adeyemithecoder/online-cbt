@@ -214,13 +214,10 @@ export default function FeesPage() {
   const [outstanding, setOutstanding] = useState<any[]>([]);
   const [accounts, setAccounts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [modal, setModal] = useState<
     "createStructure" | "editStructure" | "assign" | "bulkAssign" | null
   >(null);
-
   const [selectedStructure, setSelectedStructure] = useState<any>(null);
-
   const [saving, setSaving] = useState(false);
   const [feeForm, setFeeForm] = useState(emptyFeeForm);
   const [search, setSearch] = useState("");
@@ -241,6 +238,19 @@ export default function FeesPage() {
     value: s.id,
     label: `${s.name} (${s.level}) — ${fmt.currency(s.amount)}`,
   }));
+
+  const [selectedSessionId, setSelectedSessionId] = useState(
+    currentSessionId || "",
+  );
+
+  const SESSION_OPTIONS = [
+    { value: "", label: "All Sessions" },
+    ...(accountingAuth.sessions ?? []).map((s) => ({
+      value: s.id,
+      label: `${s.name} — ${s.term} Term`,
+    })),
+  ];
+
   const handleEditStructure = async () => {
     if (!feeForm.name || !feeForm.amount) {
       toast.error("Name and amount are required.");
@@ -264,17 +274,20 @@ export default function FeesPage() {
       setSaving(false);
     }
   };
+  useEffect(() => {
+    load();
+  }, [schoolId, currentSessionId, selectedSessionId]); // 🆕
+
   const load = async () => {
     if (!schoolId) return;
     setLoading(true);
     try {
       const [sRes, oRes, aRes] = await Promise.all([
         feeStructuresApi.getAll(schoolId, currentSessionId || undefined),
-        studentFeesApi.getOutstanding(schoolId, currentSessionId || undefined),
+        studentFeesApi.getOutstanding(schoolId, selectedSessionId || undefined), // 🆕
         accountsApi.getAll(schoolId),
       ]);
       setStructures(sRes.data);
-
       setOutstanding(oRes.data.fees ?? []);
       setOutstandingMeta({
         totalOutstanding: oRes.data.totalOutstanding ?? 0,
@@ -383,6 +396,8 @@ export default function FeesPage() {
         .toLowerCase()
         .includes(search.toLowerCase()),
   );
+  console.log("first");
+  console.log(outstanding);
 
   return (
     <div className="p-4 sm:p-6 animate-fade-in">
@@ -554,12 +569,23 @@ export default function FeesPage() {
       {/* Outstanding Tab */}
       {tab === "outstanding" && (
         <>
-          <div className="mb-3 sm:mb-4">
-            <SearchInput
-              value={search}
-              onChange={setSearch}
-              placeholder="Search students..."
-            />
+          <div className="flex flex-col sm:flex-row gap-3 mb-3 sm:mb-4">
+            <div className="w-full sm:w-64">
+              <Select
+                label=""
+                options={SESSION_OPTIONS}
+                value={selectedSessionId}
+                onChange={(e) => setSelectedSessionId(e.target.value)}
+                placeholder="Filter by session..."
+              />
+            </div>
+            <div className="flex-1">
+              <SearchInput
+                value={search}
+                onChange={setSearch}
+                placeholder="Search students..."
+              />
+            </div>
           </div>
           <Card padding={false}>
             {loading ? (

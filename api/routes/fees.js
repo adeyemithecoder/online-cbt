@@ -238,7 +238,6 @@ feesRoute.get(
 // ════════════════════════════════════════════════
 // STUDENT FEES
 // ════════════════════════════════════════════════
-
 // ─── Assign Fee to Student (generate StudentFee) ──────────────────────────
 feesRoute.post(
   "/student-fees",
@@ -382,7 +381,6 @@ feesRoute.get(
   }),
 );
 
-// ─── Get Outstanding Fees (school-wide or per session) ────────────────────
 // ─── Get Outstanding Fees (school-wide or per session) ─────────────────────
 feesRoute.get(
   "/student-fees/outstanding/:schoolId",
@@ -407,12 +405,11 @@ feesRoute.get(
           },
         },
         FeeStructure: { select: { name: true, amount: true } },
-        Session: { select: { name: true, term: true } }, // ← ADD THIS
+        Session: { select: { id: true, name: true, term: true } },
       },
       orderBy: { createdAt: "asc" },
     });
 
-    // Compute balance due per record
     const result = fees.map((f) => ({
       ...f,
       balanceDue: f.amountCharged - f.amountPaid,
@@ -420,7 +417,33 @@ feesRoute.get(
 
     const totalOutstanding = result.reduce((s, f) => s + f.balanceDue, 0);
 
-    res.json({ fees: result, totalOutstanding, count: result.length });
+    // 🆕 Group by session when no sessionId filter is applied
+    const grouped = sessionId
+      ? null
+      : result.reduce((acc, f) => {
+          const key = f.sessionId;
+          if (!acc[key]) {
+            acc[key] = {
+              sessionId: f.sessionId,
+              sessionName: f.Session?.name,
+              term: f.Session?.term,
+              totalOutstanding: 0,
+              count: 0,
+              fees: [],
+            };
+          }
+          acc[key].totalOutstanding += f.balanceDue;
+          acc[key].count++;
+          acc[key].fees.push(f);
+          return acc;
+        }, {});
+
+    res.json({
+      fees: result,
+      totalOutstanding,
+      count: result.length,
+      ...(grouped ? { grouped: Object.values(grouped) } : {}),
+    });
   }),
 );
 
@@ -497,91 +520,6 @@ feesRoute.get(
     const totalOwed = result.reduce((s, f) => s + f.balanceDue, 0);
 
     res.json({ fees: result, totalOwed });
-  }),
-);
-
-// ─── Carry Forward Outstanding Fees to a New Session ─────────────────────
-// POST /fees/student-fees/carry-forward
-feesRoute.post(
-  "/student-fees/carry-forward",
-  protect,
-  expressAsyncHandler(async (req, res) => {
-    const { fromSessionId, toSessionId, schoolId } = req.body;
-
-    if (!fromSessionId || !toSessionId || !schoolId) {
-      return res.status(400).json({
-        message: "fromSessionId, toSessionId and schoolId are required.",
-      });
-    }
-
-    // Get all unpaid/partial fees from the old session
-    const outstanding = await prisma.studentFee.findMany({
-      where: {
-        schoolId,
-        sessionId: fromSessionId,
-        status: { in: ["UNPAID", "PARTIALLY_PAID"] },
-      },
-      include: { FeeStructure: true },
-    });
-
-    if (outstanding.length === 0) {
-      return res.status(404).json({
-        message: "No outstanding fees found for the selected session.",
-      });
-    }
-
-    let carried = 0;
-    let skipped = 0;
-
-    for (const fee of outstanding) {
-      const balanceDue = fee.amountCharged - fee.amountPaid;
-      if (balanceDue <= 0) {
-        skipped++;
-        continue;
-      }
-
-      // Check if already carried forward
-      const exists = await prisma.studentFee.findFirst({
-        where: {
-          studentId: fee.studentId,
-          feeStructureId: fee.feeStructureId,
-          sessionId: toSessionId,
-          carriedForwardFrom: fee.id, // track origin
-        },
-      });
-      if (exists) {
-        skipped++;
-        continue;
-      }
-
-      try {
-        await prisma.studentFee.create({
-          data: {
-            studentId: fee.studentId,
-            feeStructureId: fee.feeStructureId,
-            sessionId: toSessionId,
-            schoolId,
-            amountCharged: balanceDue, // only the unpaid balance
-            amountPaid: 0,
-            status: "UNPAID",
-            carriedForwardFrom: fee.id, // ← add this field to your schema
-          },
-        });
-        carried++;
-      } catch (e) {
-        if (e.code === "P2002") {
-          skipped++;
-        } else {
-          throw e;
-        }
-      }
-    }
-
-    res.json({
-      message: `Carry forward complete. Carried: ${carried}, Skipped: ${skipped}.`,
-      carried,
-      skipped,
-    });
   }),
 );
 

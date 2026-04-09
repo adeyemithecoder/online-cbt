@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { CalendarDays, Plus, Lock, Unlock, Star } from "lucide-react";
 import { useApp } from "../../context/AppContext";
-import { sessionsApi, studentFeesApi } from "../../api/client";
+import { sessionsApi } from "../../api/client";
 import { useToast } from "../../context/ToastContext";
 import {
   Button,
@@ -71,7 +71,19 @@ export default function SessionsPage() {
     }
     setSaving(true);
     try {
-      await sessionsApi.create({ ...form, schoolId });
+      const res = await sessionsApi.create({ ...form, schoolId });
+      setAccountingAuth({
+        ...accountingAuth,
+        sessions: [
+          {
+            id: res.data.id,
+            name: res.data.name,
+            term: res.data.term,
+            isCurrent: res.data.isCurrent,
+          },
+          ...accountingAuth.sessions,
+        ],
+      });
       toast.success("Session created.");
       setModal(false);
       setForm({ name: "", term: "", startDate: "", endDate: "" });
@@ -83,63 +95,24 @@ export default function SessionsPage() {
     }
   };
 
-  // Add state
-  const [carryForwardModal, setCarryForwardModal] = useState(false);
-  const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
-  const [carryingForward, setCarryingForward] = useState(false);
-
-  // Replace handleSetCurrent
   const handleSetCurrent = async (id: string) => {
-    setPendingSessionId(id);
-    setCarryForwardModal(true); // ask first
-  };
-
-  const confirmSetCurrent = async (doCarryForward: boolean) => {
-    if (!pendingSessionId) return;
-    setActionId(pendingSessionId);
-    setCarryForwardModal(false);
+    setActionId(id);
     try {
-      // 1. Set the new current session
-      await sessionsApi.setCurrent(pendingSessionId, schoolId);
+      await sessionsApi.setCurrent(id, schoolId);
       setAccountingAuth({
         ...accountingAuth,
-        currentSessionId: pendingSessionId,
+        currentSessionId: id,
         sessions: accountingAuth.sessions.map((s) => ({
-          // 🆕
           ...s,
-          isCurrent: s.id === pendingSessionId,
+          isCurrent: s.id === id,
         })),
       });
       toast.success("Current session updated.");
-
-      // 2. Optionally carry forward outstanding fees
-      if (doCarryForward) {
-        const previousSession = sessions.find((s) => s.isCurrent);
-        if (previousSession) {
-          setCarryingForward(true);
-          try {
-            const res = await studentFeesApi.carryForward({
-              fromSessionId: previousSession.id,
-              toSessionId: pendingSessionId,
-              schoolId,
-            });
-            toast.success(res.data.message);
-          } catch (e) {
-            toast.error(
-              "Session switched but carry-forward failed: " +
-                getErrorMessage(e),
-            );
-          } finally {
-            setCarryingForward(false);
-          }
-        }
-      }
       load();
     } catch (e) {
       toast.error(getErrorMessage(e));
     } finally {
       setActionId(null);
-      setPendingSessionId(null);
     }
   };
 
@@ -333,49 +306,6 @@ export default function SessionsPage() {
 
             <Button loading={saving} onClick={handleCreate} className="flex-1">
               Create Session
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
-      <Modal
-        open={carryForwardModal}
-        onClose={() => {
-          setCarryForwardModal(false);
-          setPendingSessionId(null);
-        }}
-        title="Switch Current Session"
-      >
-        <div className="p-4 sm:p-6 space-y-4">
-          <p className="text-[13px] text-light m-0">
-            Do you want to carry forward any unpaid fees from the current term
-            into the new session? Students with outstanding balances will have
-            their remaining balance added to the new term.
-          </p>
-          <div className="flex flex-col gap-2 pt-1">
-            <Button
-              loading={carryingForward}
-              onClick={() => confirmSetCurrent(true)}
-              className="w-full"
-            >
-              Switch & Carry Forward Unpaid Fees
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => confirmSetCurrent(false)}
-              className="w-full"
-            >
-              Switch Without Carry Forward
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => {
-                setCarryForwardModal(false);
-                setPendingSessionId(null);
-              }}
-              className="w-full"
-            >
-              Cancel
             </Button>
           </div>
         </div>

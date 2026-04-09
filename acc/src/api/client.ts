@@ -106,17 +106,7 @@ export const studentFeesApi = {
   // 🆕 NEW — One student's full debt across all sessions
   getStudentOutstanding: (studentId: string) =>
     api.get(`/fees/student-fees/student/${studentId}/outstanding`),
-
-  // 🆕 NEW — Roll unpaid fees into next session
-  carryForward: (data: {
-    fromSessionId: string;
-    toSessionId: string;
-    schoolId: string;
-  }) => api.post("/fees/student-fees/carry-forward", data),
 };
-
-// ─── Students ─────────────────────────────────────────────────────────────
-// ─── Add to client.ts — replace the existing studentsApi block ───────────────
 
 export const studentsApi = {
   getAll: (schoolId: string, level?: string) =>
