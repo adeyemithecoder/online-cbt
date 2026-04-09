@@ -40,6 +40,7 @@ export default function LoginPage() {
         currentSessionId: res.data.currentSessionId,
         role,
         classes: res.data.classes || [],
+        sessions: res.data.sessions || [], // 🆕
       });
 
       navigate(role === "SUPER_ADMIN" ? "/super-admin" : "/");

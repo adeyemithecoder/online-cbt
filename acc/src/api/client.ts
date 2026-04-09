@@ -74,7 +74,6 @@ export const feeStructuresApi = {
 };
 
 // ─── Student Fees ─────────────────────────────────────────────────────────
-// ─── Student Fees ─────────────────────────────────────────────────────────
 export const studentFeesApi = {
   assign: (data: any) => api.post("/fees/student-fees", data),
   bulkAssign: (data: any) => api.post("/fees/student-fees/bulk-assign", data),
@@ -112,7 +111,6 @@ export const studentsApi = {
     api.get(`/fees/students/school/${schoolId}`, {
       params: level ? { level } : {},
     }),
-
   create: (data: {
     name: string;
     surname: string;
@@ -121,7 +119,6 @@ export const studentsApi = {
     level: string;
     schoolId: string;
   }) => api.post("/fees/students", data),
-
   update: (
     id: string,
     data: {
@@ -131,11 +128,16 @@ export const studentsApi = {
       password?: string;
     },
   ) => api.put(`/fees/students/${id}`, data),
-
   delete: (id: string) => api.delete(`/fees/students/${id}`),
-
   search: (schoolId: string, q: string) =>
     api.get("/fees/students/search", { params: { schoolId, q } }),
+  promote: (data: {
+    schoolId: string;
+    fromLevel: string;
+    toLevel: string;
+    fromYear: string;
+    toYear: string;
+  }) => api.post("/fees/students/promote", data),
 };
 
 // ─── Payments ─────────────────────────────────────────────────────────────

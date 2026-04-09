@@ -138,16 +138,24 @@ userRoute.post(
 
     let currentSessionId = null;
     let classes = [];
+    let sessions = []; // 🆕 declare here
 
     if (user.schoolId) {
-      const [currentSession, school] = await Promise.all([
+      const [currentSession, school, fetchedSessions] = await Promise.all([
+        // rename to fetchedSessions
         prisma.academicSession.findFirst({
           where: { schoolId: user.schoolId, isCurrent: true },
         }),
         prisma.school.findUnique({ where: { id: user.schoolId } }),
+        prisma.academicSession.findMany({
+          where: { schoolId: user.schoolId },
+          orderBy: { createdAt: "desc" },
+          select: { id: true, name: true, term: true, isCurrent: true },
+        }),
       ]);
       currentSessionId = currentSession?.id || null;
       classes = school?.classes || [];
+      sessions = fetchedSessions; // assign the renamed variable
     }
 
     res.status(200).json({
@@ -158,7 +166,9 @@ userRoute.post(
       schoolId: user.schoolId || null,
       role: user.role,
       classes,
+      sessions,
     });
   }),
 );
+
 export { userRoute };

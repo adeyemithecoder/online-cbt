@@ -98,13 +98,17 @@ export default function SessionsPage() {
     if (!pendingSessionId) return;
     setActionId(pendingSessionId);
     setCarryForwardModal(false);
-
     try {
       // 1. Set the new current session
       await sessionsApi.setCurrent(pendingSessionId, schoolId);
       setAccountingAuth({
         ...accountingAuth,
         currentSessionId: pendingSessionId,
+        sessions: accountingAuth.sessions.map((s) => ({
+          // 🆕
+          ...s,
+          isCurrent: s.id === pendingSessionId,
+        })),
       });
       toast.success("Current session updated.");
 
@@ -130,7 +134,6 @@ export default function SessionsPage() {
           }
         }
       }
-
       load();
     } catch (e) {
       toast.error(getErrorMessage(e));
@@ -140,7 +143,6 @@ export default function SessionsPage() {
     }
   };
 
-  console.log(sessions);
   const handleToggleLock = async (session: any) => {
     setActionId(session.id);
     try {

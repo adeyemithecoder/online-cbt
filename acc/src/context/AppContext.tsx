@@ -1,5 +1,12 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 
+interface Session {
+  id: string;
+  name: string;
+  term: string;
+  isCurrent: boolean;
+}
+
 interface AccountingAuth {
   userId: string;
   schoolId: string;
@@ -7,6 +14,7 @@ interface AccountingAuth {
   currentSessionId: string;
   role: string;
   classes: string[];
+  sessions: Session[]; // 🆕
 }
 
 interface AppContextType {
@@ -22,6 +30,7 @@ const defaultAuth: AccountingAuth = {
   currentSessionId: "",
   role: "",
   classes: [],
+  sessions: [], // 🆕
 };
 
 const AppContext = createContext<AppContextType>({

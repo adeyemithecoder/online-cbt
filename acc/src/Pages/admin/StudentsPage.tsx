@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Users, Eye, EyeOff, UserPlus, Pencil, Trash2 } from "lucide-react";
+import {
+  Users,
+  Eye,
+  EyeOff,
+  UserPlus,
+  Pencil,
+  Trash2,
+  ArrowRightCircle,
+} from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { studentsApi, studentFeesApi } from "../../api/client";
 import { useToast } from "../../context/ToastContext";
@@ -34,12 +42,23 @@ const emptyForm = {
 export default function StudentsPage() {
   const { accountingAuth } = useApp();
   const { schoolId, currentSessionId, classes } = accountingAuth;
+
+  const SESSION_OPTIONS = Array.from(
+    new Map(
+      accountingAuth.sessions.map((s) => [
+        s.name,
+        { value: s.name, label: s.name },
+      ]),
+    ).values(),
+  );
+
   const toast = useToast();
 
   const LEVEL_OPTIONS = classes.map((c) => ({
     value: c,
     label: c.toUpperCase(),
   }));
+
   const [students, setStudents] = useState<any[]>([]);
   const [studentFees, setStudentFees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,12 +73,51 @@ export default function StudentsPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
+  const [promoting, setPromoting] = useState(false);
+  const [promoteModal, setPromoteModal] = useState(false);
+  const [promoteForm, setPromoteForm] = useState({
+    fromLevel: "",
+    toLevel: "",
+    fromYear: "",
+    toYear: "",
+  });
 
   // Add this state
   const [studentOutstanding, setStudentOutstanding] = useState<any>({
     fees: [],
     totalOwed: 0,
   });
+  const handlePromote = async () => {
+    const { fromLevel, toLevel, fromYear, toYear } = promoteForm;
+    if (!fromLevel || !toLevel || !fromYear || !toYear) {
+      toast.error("All fields are required.");
+      return;
+    }
+    if (fromLevel === toLevel) {
+      toast.error("From and To levels must be different.");
+      return;
+    }
+    setPromoting(true);
+    try {
+      const res = await studentsApi.promote({
+        schoolId,
+        fromLevel,
+        toLevel,
+        fromYear,
+        toYear,
+      });
+      toast.success(
+        `Done! ${res.data.promoted} student(s) promoted. ${res.data.feesCarried} outstanding fee(s) carried forward.`,
+      );
+      setPromoteModal(false);
+      setPromoteForm({ fromLevel: "", toLevel: "", fromYear: "", toYear: "" });
+      load();
+    } catch (e) {
+      toast.error(getErrorMessage(e));
+    } finally {
+      setPromoting(false);
+    }
+  };
 
   // Update openView
   const openView = async (s: any) => {
@@ -219,16 +277,24 @@ export default function StudentsPage() {
         subtitle="Register and manage student accounts"
         icon={<Users size={20} />}
         action={
-          <Button
-            leftIcon={<UserPlus size={15} />}
-            onClick={() => {
-              setForm(emptyForm);
-              setModal("create");
-            }}
-          >
-            <span className="hidden sm:inline">Register Student</span>
-            <span className="sm:hidden">Register</span>
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              leftIcon={<ArrowRightCircle size={15} />}
+              onClick={() => setPromoteModal(true)}
+            >
+              <span className="hidden sm:inline">Promote Class</span>
+            </Button>
+            <Button
+              leftIcon={<UserPlus size={15} />}
+              onClick={() => {
+                setForm(emptyForm);
+                setModal("create");
+              }}
+            >
+              <span className="hidden sm:inline">Register Student</span>
+            </Button>
+          </div>
         }
       />
 
@@ -253,7 +319,6 @@ export default function StudentsPage() {
           sub="Matching students"
         />
       </div>
-
       {/* Level tabs + search */}
       <div className="flex flex-col gap-3 mb-3 sm:mb-4">
         <Tabs
@@ -270,7 +335,6 @@ export default function StudentsPage() {
           placeholder="Search by name or surname..."
         />
       </div>
-
       <Card padding={false}>
         {loading ? (
           <Loader />
@@ -342,7 +406,6 @@ export default function StudentsPage() {
           </Table>
         )}
       </Card>
-
       {/* ── Register Modal ─────────────────────────────────────────────── */}
       <Modal
         open={modal === "create"}
@@ -408,7 +471,6 @@ export default function StudentsPage() {
           </div>
         </div>
       </Modal>
-
       {/* ── Edit Modal ─────────────────────────────────────────────────── */}
       <Modal open={modal === "edit"} onClose={resetModal} title="Edit Student">
         <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
@@ -468,7 +530,6 @@ export default function StudentsPage() {
           </div>
         </div>
       </Modal>
-
       {/* ── Delete Confirm Modal ────────────────────────────────────────── */}
       <Modal
         open={modal === "delete"}
@@ -504,7 +565,6 @@ export default function StudentsPage() {
           </div>
         )}
       </Modal>
-
       {/* ── View Modal ─────────────────────────────────────────────────── */}
       <Modal
         open={modal === "view"}
@@ -640,6 +700,87 @@ export default function StudentsPage() {
             </div>
           </div>
         )}
+      </Modal>
+      {/* ── Promote Class Modal ───────────────────────────────────────────── */}
+      <Modal
+        open={promoteModal}
+        onClose={() => setPromoteModal(false)}
+        title="Promote Class to Next Level"
+      >
+        <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
+          <p className="text-[13px] text-light m-0">
+            This will move all students from one level to another and carry
+            forward any outstanding fees to the new session.
+          </p>
+
+          <Select
+            label="From Level (Current Class)"
+            options={LEVEL_OPTIONS}
+            value={promoteForm.fromLevel}
+            onChange={(e) =>
+              setPromoteForm({ ...promoteForm, fromLevel: e.target.value })
+            }
+            placeholder="Select current level..."
+            required
+          />
+          <Select
+            label="To Level (Next Class)"
+            options={LEVEL_OPTIONS}
+            value={promoteForm.toLevel}
+            onChange={(e) =>
+              setPromoteForm({ ...promoteForm, toLevel: e.target.value })
+            }
+            placeholder="Select next level..."
+            required
+          />
+          <Select
+            label="From Session (Academic Year)"
+            options={SESSION_OPTIONS}
+            value={promoteForm.fromYear}
+            onChange={(e) =>
+              setPromoteForm({ ...promoteForm, fromYear: e.target.value })
+            }
+            placeholder="Select academic year..."
+            required
+          />
+          <Select
+            label="To Session (Academic Year)"
+            options={SESSION_OPTIONS}
+            value={promoteForm.toYear}
+            onChange={(e) =>
+              setPromoteForm({ ...promoteForm, toYear: e.target.value })
+            }
+            placeholder="Select academic year..."
+            required
+          />
+
+          {/* Warning */}
+          {promoteForm.fromLevel &&
+            promoteForm.toLevel &&
+            promoteForm.fromLevel === promoteForm.toLevel && (
+              <p className="text-[12px] text-danger m-0">
+                ⚠ From and To levels must be different.
+              </p>
+            )}
+
+          <div className="flex gap-2 sm:gap-3 pt-2">
+            <Button
+              variant="secondary"
+              onClick={() => setPromoteModal(false)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              loading={promoting}
+              onClick={handlePromote}
+              leftIcon={<ArrowRightCircle size={14} />}
+              className="flex-1"
+            >
+              Promote Students
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

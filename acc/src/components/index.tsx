@@ -238,8 +238,8 @@ export function Select({
   disabled,
 }: SelectProps) {
   const selectId = id || label?.toLowerCase().replace(/\s+/g, "-");
-  const rsOptions = options.map((o) => ({ value: o.value, label: o.label }));
-  const rsValue = rsOptions.find((o) => o.value === value) ?? null;
+  const rsOptions = options?.map((o) => ({ value: o.value, label: o.label }));
+  const rsValue = rsOptions?.find((o) => o.value === value) ?? null;
 
   const handleChange = (selected: any) => {
     if (onChange) {
