@@ -2,6 +2,7 @@ import express from "express";
 const reportsRoute = express.Router();
 import expressAsyncHandler from "express-async-handler";
 import prisma from "../prisma/prisma.js";
+import { protect } from "../middleware/auth.js";
 
 // ════════════════════════════════════════════════
 // RULE: All reports use ONLY POSTED journal entries
@@ -11,6 +12,7 @@ import prisma from "../prisma/prisma.js";
 // ─── Ledger — Get all journal lines for an account with running balance ────
 reportsRoute.get(
   "/ledger/:accountId",
+  protect,
   expressAsyncHandler(async (req, res) => {
     const { accountId } = req.params;
     const { sessionId, schoolId } = req.query;
@@ -77,6 +79,7 @@ reportsRoute.get(
 // Aggregate all accounts — show total debit and credit per account
 reportsRoute.get(
   "/trial-balance/:schoolId",
+  protect,
   expressAsyncHandler(async (req, res) => {
     const { schoolId } = req.params;
     const { sessionId } = req.query;
@@ -146,6 +149,7 @@ reportsRoute.get(
 // Groups accounts into: Assets | Liabilities | Equity
 reportsRoute.get(
   "/balance-sheet/:schoolId",
+  protect,
   expressAsyncHandler(async (req, res) => {
     const { schoolId } = req.params;
     const { sessionId } = req.query;
@@ -202,18 +206,6 @@ reportsRoute.get(
 
     const isBalanced =
       Math.abs(assets.total - liabilitiesPlusEquityPlusProfit) < 0.01;
-
-    // console.log("assets=", assets);
-    // console.log("liabilities=", liabilities);
-    // console.log("equity=", equity);
-    // console.log("revenue=", revenue);
-    // console.log("expenses=", expenses);
-    // console.log("netProfit=", netProfit);
-    // console.log(
-    //   "liabilitiesPlusEquityPlusProfit=",
-    //   liabilitiesPlusEquityPlusProfit,
-    // );
-
     res.json({
       assets,
       liabilities,
@@ -233,6 +225,7 @@ reportsRoute.get(
 // Revenue − Expenses = Net Profit / Loss
 reportsRoute.get(
   "/income-statement/:schoolId",
+  protect,
   expressAsyncHandler(async (req, res) => {
     const { schoolId } = req.params;
     const { sessionId } = req.query;

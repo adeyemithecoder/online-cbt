@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
 import { useApp } from "../../context/AppContext";
@@ -13,6 +13,16 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+
+  const [sessionMessage, setSessionMessage] = useState("");
+
+  useEffect(() => {
+    const reason = localStorage.getItem("authRedirectReason");
+    if (reason === "session_expired") {
+      setSessionMessage("Your session has expired. Please sign in again.");
+      localStorage.removeItem("authRedirectReason"); // clear so it doesn't persist
+    }
+  }, []);
 
   const apiUrl =
     import.meta.env.MODE == "development"
@@ -106,6 +116,32 @@ export default function LoginPage() {
             }
           />
 
+          {/* ── Session Expired Modal ───────────────────────────────────────── */}
+          {sessionMessage && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+              <div
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                onClick={() => setSessionMessage("")}
+              />
+              <div className="relative w-full max-w-[340px] bg-white/5 backdrop-blur-xl border border-warning/30 rounded-2xl p-6 shadow-[0_10px_40px_rgba(0,0,0,0.6)] text-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-warning/20 flex items-center justify-center">
+                  <Lock size={20} className="text-warning" />
+                </div>
+                <h3 className="text-white font-bold text-[16px] mb-2">
+                  Session Expired
+                </h3>
+                <p className="text-light text-[13px] mb-5 m-0">
+                  {sessionMessage}
+                </p>
+                <button
+                  onClick={() => setSessionMessage("")}
+                  className="w-full py-2.5 rounded-lg bg-warning text-bg font-semibold text-[13px] hover:opacity-90 transition-all"
+                >
+                  OK, Sign me in
+                </button>
+              </div>
+            </div>
+          )}
           {/* Error message */}
           {error && (
             <p className="text-[12px] text-danger bg-danger/10 border border-danger/20 rounded-lg px-3 py-2 m-0">

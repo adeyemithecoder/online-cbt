@@ -66,6 +66,7 @@ sessionRoute.get(
 // ─── Get Current Session ───────────────────────────────────────────────────
 sessionRoute.get(
   "/current/:schoolId",
+  protect,
   expressAsyncHandler(async (req, res) => {
     const { schoolId } = req.params;
 

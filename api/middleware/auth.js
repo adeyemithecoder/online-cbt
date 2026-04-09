@@ -16,6 +16,12 @@ export const protect = (req, res, next) => {
 
     next();
   } catch (err) {
+    console.log("tokenError", err);
+    if (err.name === "TokenExpiredError") {
+      console.log("Token expired");
+      return res.status(401).json({ message: "Token expired" });
+    }
+
     return res.status(401).json({ message: "Invalid token" });
   }
 };

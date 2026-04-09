@@ -13,6 +13,7 @@ import { protect } from "../middleware/auth.js";
 // GET /fees/students/search?q=john&schoolId=xxx
 feesRoute.get(
   "/students/search",
+  protect,
   expressAsyncHandler(async (req, res) => {
     const { q, schoolId } = req.query;
 
@@ -215,6 +216,7 @@ feesRoute.get(
 // ─── Get Fee Structures by Class / Level ──────────────────────────────────
 feesRoute.get(
   "/structures/school/:schoolId/level/:level",
+  protect,
   expressAsyncHandler(async (req, res) => {
     const { schoolId, level } = req.params;
     const { sessionId } = req.query;

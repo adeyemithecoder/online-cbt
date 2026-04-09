@@ -175,6 +175,7 @@ paymentRoute.post(
 // ─── Get All Payments ──────────────────────────────────────────────────────
 paymentRoute.get(
   "/school/:schoolId",
+  protect,
   expressAsyncHandler(async (req, res) => {
     const { schoolId } = req.params;
     const { sessionId } = req.query;
@@ -197,6 +198,7 @@ paymentRoute.get(
 // ─── Get Payments by Student ───────────────────────────────────────────────
 paymentRoute.get(
   "/student/:studentId",
+  protect,
   expressAsyncHandler(async (req, res) => {
     const { studentId } = req.params;
     const { sessionId } = req.query;
@@ -217,6 +219,7 @@ paymentRoute.get(
 // ─── Get Payments by Session ───────────────────────────────────────────────
 paymentRoute.get(
   "/session/:sessionId",
+  protect,
   expressAsyncHandler(async (req, res) => {
     const { sessionId } = req.params;
 

@@ -4,10 +4,13 @@ import Sidebar from "./Sidebar";
 import SuperAdminLayout from "./SuperAdminLayout";
 
 export default function Layout() {
-  const { accountingAuth } = useApp();
-  const { userId, role } = accountingAuth;
+  const { accountingAuth, clearAccountingAuth } = useApp();
+  const { userId, role, token } = accountingAuth;
 
-  if (!userId) return <Navigate to="/login" replace />;
+  if (!userId || !token) {
+    clearAccountingAuth();
+    return <Navigate to="/login" replace />;
+  }
 
   if (role === "SUPER_ADMIN") return <SuperAdminLayout />;
 

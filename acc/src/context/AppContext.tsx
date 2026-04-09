@@ -14,7 +14,7 @@ export interface AccountingAuth {
   currentSessionId: string;
   role: string;
   classes: string[];
-  sessions: Session[]; // 🆕
+  sessions: Session[];
 }
 
 interface AppContextType {
@@ -30,7 +30,7 @@ export const defaultAuth: AccountingAuth = {
   currentSessionId: "",
   role: "",
   classes: [],
-  sessions: [], // 🆕
+  sessions: [],
 };
 
 const AppContext = createContext<AppContextType>({
@@ -43,7 +43,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [accountingAuth, setAccountingAuthState] = useState<AccountingAuth>(
     () => {
       const stored = localStorage.getItem("accountingAuth");
-      return stored ? JSON.parse(stored) : defaultAuth;
+
+      if (!stored) return defaultAuth;
+
+      try {
+        return JSON.parse(stored);
+      } catch {
+        localStorage.removeItem("accountingAuth");
+        return defaultAuth;
+      }
     },
   );
 

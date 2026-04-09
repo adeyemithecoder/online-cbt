@@ -173,6 +173,7 @@ expenseRoute.put(
 // ─── Reject Expense ────────────────────────────────────────────────────────
 expenseRoute.put(
   "/:id/reject",
+  protect,
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
     const { approvedById } = req.body;
@@ -208,6 +209,7 @@ expenseRoute.put(
 // ─── Get All Expenses ──────────────────────────────────────────────────────
 expenseRoute.get(
   "/school/:schoolId",
+  protect,
   expressAsyncHandler(async (req, res) => {
     const { schoolId } = req.params;
     const { status, sessionId, startDate, endDate } = req.query;

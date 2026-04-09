@@ -22,6 +22,18 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error),
 );
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    console.log(err.response?.status);
+    if (err.response?.status === 401) {
+      localStorage.removeItem("accountingAuth");
+      localStorage.setItem("authRedirectReason", "session_expired");
+      window.location.href = "/login";
+    }
+    return Promise.reject(err);
+  },
+);
 
 // ─── Sessions ──────────────────────────────────────────────────────────────
 export const sessionsApi = {

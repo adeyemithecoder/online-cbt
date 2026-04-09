@@ -133,12 +133,12 @@ userRoute.post(
     const token = jwt.sign(
       { id: user.id, role: user.role, schoolId: user.schoolId },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" },
+      { expiresIn: process.env.JWT_EXPIRES_IN },
     );
 
     let currentSessionId = null;
     let classes = [];
-    let sessions = []; // 🆕 declare here
+    let sessions = [];
 
     if (user.schoolId) {
       const [currentSession, school, fetchedSessions] = await Promise.all([
