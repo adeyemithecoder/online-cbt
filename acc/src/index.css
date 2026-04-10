@@ -4,7 +4,7 @@
   --font-display: "Inter", system-ui, sans-serif;
   --font-body: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
-  /* ── Gold palette ─────────────────────────────────────────────────────── */
+
   --color-bg: #1f1f38;
   --color-bg-deep: #2c2c6c;
   --color-primary: #4db5ff;
@@ -84,8 +84,8 @@ h4 {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-gold-500) 30%, transparent);
-  color: var(--color-gold-200);
+  background: var(--color-primary-variant);
+  color: var(--color-white);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
