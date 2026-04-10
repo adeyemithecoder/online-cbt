@@ -6,49 +6,6 @@ import { createAuditLog } from "./_helpers.js";
 import { protect } from "../middleware/auth.js";
 
 // ════════════════════════════════════════════════
-// STUDENT SEARCH
-// ════════════════════════════════════════════════
-
-// ─── Search Students by Name or Surname ───────────────────────────────────
-// GET /fees/students/search?q=john&schoolId=xxx
-feesRoute.get(
-  "/students/search",
-  protect,
-  expressAsyncHandler(async (req, res) => {
-    const { q, schoolId } = req.query;
-
-    if (!q || !schoolId) {
-      return res
-        .status(400)
-        .json({ message: "Query (q) and schoolId are required." });
-    }
-
-    const query = String(q).trim();
-
-    const students = await prisma.student.findMany({
-      where: {
-        schoolId: String(schoolId),
-        OR: [
-          { name: { contains: query, mode: "insensitive" } },
-          { surname: { contains: query, mode: "insensitive" } },
-        ],
-      },
-      select: {
-        id: true,
-        name: true,
-        surname: true,
-        username: true,
-        level: true,
-      },
-      take: 15, // cap results for performance
-      orderBy: { name: "asc" },
-    });
-
-    res.json(students);
-  }),
-);
-
-// ════════════════════════════════════════════════
 // FEE STRUCTURE
 // ════════════════════════════════════════════════
 
