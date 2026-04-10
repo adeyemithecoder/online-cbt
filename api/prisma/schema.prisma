@@ -217,10 +217,10 @@ model Loan {
   cashAccountId String         @db.ObjectId
   CashAccount   ChartOfAccount @relation("CashAccountLoan", fields: [cashAccountId], references: [id])
 
-  journalEntryId String? @db.ObjectId
-
-  schoolId String @db.ObjectId
-  School   School @relation(fields: [schoolId], references: [id])
+  journalEntryId          String? @db.ObjectId
+  repaymentJournalEntryId String? @db.ObjectId
+  schoolId                String  @db.ObjectId
+  School                  School  @relation(fields: [schoolId], references: [id])
 
   sessionId String          @db.ObjectId
   Session   AcademicSession @relation(fields: [sessionId], references: [id])
@@ -506,6 +506,7 @@ enum JournalSource {
   EXPENSE
   LOAN
   DONATION
+  LOAN_REPAYMENT
 }
 
 enum FeeStatus {

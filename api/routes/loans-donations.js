@@ -125,31 +125,79 @@ loanDonationRoute.put(
   protect,
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
+    const userId = req.user.id;
 
     const loan = await prisma.loan.findUnique({ where: { id } });
-    if (!loan) return res.status(404).json({ message: "Loan not found." });
-    if (loan.status === "PAID") {
-      return res
-        .status(400)
-        .json({ message: "Loan is already marked as paid." });
+
+    if (!loan) {
+      return res.status(404).json({ message: "Loan not found." });
     }
 
-    const updated = await prisma.loan.update({
-      where: { id },
-      data: { status: "PAID" },
+    if (loan.status === "PAID") {
+      return res.status(400).json({ message: "Already paid." });
+    }
+
+    await assertSessionNotLocked(loan.sessionId);
+
+    const entryNumber = await generateEntryNumber(loan.schoolId);
+
+    const result = await prisma.$transaction(async (tx) => {
+      // 🔥 1. Create repayment journal entry
+      const repaymentEntry = await tx.journalEntry.create({
+        data: {
+          entryNumber,
+          date: new Date(),
+          description: `Loan repayment to ${loan.lender}`,
+          source: "LOAN_REPAYMENT",
+          status: "POSTED",
+          postedAt: new Date(),
+          sessionId: loan.sessionId,
+          schoolId: loan.schoolId,
+          createdById: userId,
+          lines: {
+            create: [
+              {
+                accountId: loan.liabilityAccountId,
+                entryType: "DEBIT", // 🔥 reduces liability
+                amount: loan.amount,
+                narration: `Loan cleared — ${loan.lender}`,
+              },
+              {
+                accountId: loan.cashAccountId,
+                entryType: "CREDIT", // 🔥 cash leaves
+                amount: loan.amount,
+                narration: `Cash paid for loan — ${loan.lender}`,
+              },
+            ],
+          },
+        },
+      });
+
+      // 🔥 2. Update loan
+      const updatedLoan = await tx.loan.update({
+        where: { id },
+        data: {
+          status: "PAID",
+          repaymentJournalEntryId: repaymentEntry.id, // 👈 IMPORTANT
+        },
+      });
+
+      return { repaymentEntry, updatedLoan };
     });
 
     await createAuditLog({
-      action: "UPDATE",
+      action: "LOAN_REPAID",
       entity: "Loan",
       entityId: id,
-      userId: req.user?.id,
+      userId,
       schoolId: loan.schoolId,
-      oldData: { status: "ACTIVE" },
-      newData: { status: "PAID" },
+      newData: { amount: loan.amount },
     });
 
-    res.json({ message: "Loan marked as paid.", loan: updated });
+    res.json({
+      message: "Loan repaid successfully.",
+      loan: result.updatedLoan,
+    });
   }),
 );
 

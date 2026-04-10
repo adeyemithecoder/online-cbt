@@ -168,7 +168,6 @@ journalRoute.put(
 
 // ─── Reverse a Posted Journal Entry ───────────────────────────────────────
 // Creates a new entry with all debits/credits flipped
-
 journalRoute.post(
   "/:id/reverse",
   protect,
